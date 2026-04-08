@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Insight Hub</title>
+<style>
+  :root {
+    --bg: #18181b; --surface: #27272a; --border: #3f3f46;
+    --text: #fafafa; --text-secondary: #a1a1aa;
+    --accent: #a78bfa; --accent2: #ec4899; --accent-dim: #7c3aed;
+    --tag-model: linear-gradient(135deg, #3b82f6, #6366f1);
+    --tag-startup: linear-gradient(135deg, #10b981, #34d399);
+    --tag-policy: linear-gradient(135deg, #f59e0b, #fbbf24);
+    --tag-research: linear-gradient(135deg, #ec4899, #f472b6);
+    --tag-hardware: linear-gradient(135deg, #f97316, #fb923c);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7;
+  }
+
+  /* ===== Top Nav ===== */
+  .top-nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(24,24,27,0.85); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 16px;
+  }
+  .nav-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; gap: 24px;
+    height: 56px;
+  }
+  .nav-logo {
+    font-size: 18px; font-weight: 700; white-space: nowrap;
+    background: linear-gradient(135deg, #a78bfa, #ec4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    padding: 8px 18px; border-radius: 8px; font-size: 14px; font-weight: 500;
+    color: var(--text-secondary); cursor: pointer; transition: all 0.2s;
+    border: 1px solid transparent; user-select: none;
+  }
+  .nav-tab:hover { color: var(--text); background: rgba(167,139,250,0.08); }
+  .nav-tab.active {
+    color: #fff; background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(236,72,153,0.15));
+    border-color: rgba(167,139,250,0.3);
+  }
+
+  /* ===== Page container ===== */
+  .page { display: none; padding: 0 16px; }
+  .page.active { display: block; }
+  .container { max-width: 900px; margin: 0 auto; padding-bottom: 80px; }
+
+  /* ===== Page 1: Daily Archive ===== */
+  .page-header { padding: 40px 0 28px; border-bottom: 1px solid var(--border); text-align: center; }
+  .page-header h1 {
+    font-size: 26px; font-weight: 700;
+    background: linear-gradient(135deg, #a78bfa, #ec4899, #f97316);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .page-header p { color: var(--text-secondary); font-size: 13px; margin-top: 8px; }
+  .stats { display: flex; justify-content: center; gap: 32px; margin-top: 16px; }
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-size: 24px; font-weight: 700;
+    background: linear-gradient(135deg, #a78bfa, #ec4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .stat-label { font-size: 12px; color: var(--text-secondary); }
+
+  .day-section { margin-top: 40px; padding-bottom: 40px; border-bottom: 1px solid var(--border); }
+  .day-section:last-child { border-bottom: none; }
+  .day-date {
+    font-size: 20px; font-weight: 600;
+    background: linear-gradient(90deg, #a78bfa, #ec4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+  }
+  .day-date::before {
+    content: ""; display: inline-block; width: 4px; height: 22px;
+    background: linear-gradient(180deg, #a78bfa, #ec4899); border-radius: 2px;
+  }
+  .news-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 20px; margin-bottom: 12px; transition: all 0.2s;
+  }
+  .news-item:hover { border-color: var(--accent); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .news-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .news-title a { color: #e0e7ff; text-decoration: none; transition: color 0.2s; }
+  .news-title a:hover { color: var(--accent); }
+  .news-summary { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+  .news-tag {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    padding: 2px 10px; border-radius: 20px; margin-right: 6px; margin-bottom: 8px; color: #fff;
+  }
+  .tag-model { background: var(--tag-model); }
+  .tag-startup { background: var(--tag-startup); }
+  .tag-policy { background: var(--tag-policy); }
+  .tag-research { background: var(--tag-research); }
+  .tag-hardware { background: var(--tag-hardware); }
+
+  /* ===== Page 2: C2PA Report ===== */
+  .section { margin-top: 40px; }
+  .section-title {
+    font-size: 20px; font-weight: 700; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::before {
+    content: ""; display: inline-block; width: 4px; height: 24px;
+    background: linear-gradient(180deg, var(--accent), var(--accent2)); border-radius: 2px;
+  }
+  .sub-title {
+    font-size: 16px; font-weight: 600; color: var(--accent);
+    margin: 24px 0 12px; padding-left: 14px;
+    border-left: 3px solid var(--accent);
+  }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+  thead th {
+    background: #2d2d35; color: var(--accent); font-weight: 600;
+    padding: 12px 14px; text-align: left; border-bottom: 2px solid var(--border); white-space: nowrap;
+  }
+  tbody td {
+    padding: 11px 14px; border-bottom: 1px solid var(--border);
+    color: var(--text-secondary); vertical-align: top;
+  }
+  tbody tr:hover { background: rgba(167,139,250,0.06); }
+  tbody td:first-child { color: var(--text); font-weight: 500; white-space: nowrap; }
+  .badge {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    padding: 2px 10px; border-radius: 20px; color: #fff; white-space: nowrap;
+  }
+  .badge-yes { background: linear-gradient(135deg, #10b981, #34d399); }
+  .badge-partial { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+  .badge-no { background: linear-gradient(135deg, #ef4444, #f87171); }
+  .badge-pending { background: linear-gradient(135deg, #6366f1, #818cf8); }
+  .badge-steering { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
+  .badge-member { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
+  .summary-box {
+    background: linear-gradient(135deg, rgba(167,139,250,0.1), rgba(236,72,153,0.1));
+    border: 1px solid rgba(167,139,250,0.3);
+    border-radius: 12px; padding: 20px 24px; margin: 24px 0;
+  }
+  .summary-box h3 { font-size: 15px; font-weight: 600; margin-bottom: 10px; color: var(--accent); }
+  .summary-box p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+  .footer {
+    margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border);
+    font-size: 12px; color: #52525b; text-align: center;
+  }
+
+  @media (max-width: 700px) {
+    .nav-logo { font-size: 15px; }
+    .nav-tab { padding: 6px 12px; font-size: 13px; }
+    table { font-size: 12px; }
+    thead th, tbody td { padding: 8px 10px; }
+    .page-header h1 { font-size: 22px; }
+    .news-item { padding: 14px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Top Navigation ===== -->
+<nav class="top-nav">
+  <div class="nav-inner">
+    <div class="nav-logo">AI Insight Hub</div>
+    <div class="nav-tabs">
+      <div class="nav-tab active" data-page="daily">AI æ¥æ¥</div>
+      <div class="nav-tab" data-page="c2pa">ç«æ³ & C2PA</div>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== Page 1: AI Daily Archive ===== -->
+<div class="page active" id="page-daily">
+  <div class="container">
+    <div class="page-header">
+      <h1>AI æ¥æ¥å½æ¡£</h1>
+      <p>æ¯æ¥ AI è¡ä¸å¤§äºä»¶ Â· èªå¨éé Â· æç»­æ´æ°</p>
+      <div class="stats">
+        <div class="stat-item"><div class="stat-num" id="day-count">0</div><div class="stat-label">å¤©æ°</div></div>
+        <div class="stat-item"><div class="stat-num" id="news-count">0</div><div class="stat-label">æ¡æ°é»</div></div>
+      </div>
+    </div>
+    <div id="archive">
+<!-- ARCHIVE_INSERT_POINT -->
+    </div>
+  </div>
+</div>
+
+<!-- ===== Page 2: C2PA & Legislation Report ===== -->
+<div class="page" id="page-c2pa">
+  <div class="container">
+    <div class="page-header">
+      <h1>å¨ç AI åå®¹æ è¯ç«æ³ä¸ C2PA å å¥æåµ</h1>
+      <p>æ´æ°æ¥æï¼2026 å¹´ 4 æ 7 æ¥</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">ä¸ãå¨ç AI çæåå®¹æ è¯ç«æ³æåµ</div>
+      <table>
+        <thead><tr><th>å½å®¶/å°åº</th><th>æ³è§åç§°</th><th>çææ¶é´</th><th>å¼ºå¶ç¨åº¦</th><th>æ ¸å¿è¦æ±</th></tr></thead>
+        <tbody>
+          <tr><td>ð¨ð³ ä¸­å½</td><td>ãäººå·¥æºè½çæåæåå®¹æ è¯åæ³ã+ å¼ºå¶æ§å½æ </td><td>2025.9.1</td><td><span class="badge badge-yes">å¼ºå¶</span></td><td>ææ AI çæåå®¹é¡»å¨åæ°æ®ä¸­æ·»å éå¼æ è¯ï¼é¼å±æ°å­æ°´å°ï¼éå¥æå¡å¹³å° GCmark å·²ä¸çº¿</td></tr>
+          <tr><td>ðªðº æ¬§ç</td><td>EU AI Act ç¬¬50æ¡ + æ æ³¨å®è·µåå</td><td>2026.8.2</td><td><span class="badge badge-yes">å¼ºå¶</span></td><td>AI çæçææ¬/å¾ç/é³é¢/è§é¢é¡»ä»¥æºå¨å¯è¯»æ¹å¼æ è¯ï¼ä¸å±æ¹æ¡ï¼C2PA åæ°æ® + åç´ çº§æ°´å° + æ¥å¿ç³»ç»</td></tr>
+          <tr><td>ð°ð· é©å½</td><td>ãAI åºæ¬æ³ã+ å¹¿åæ è¯ä¿®æ­£æ¡</td><td>2026.1.22</td><td><span class="badge badge-yes">å¼ºå¶</span></td><td>AI çæåå®¹é¡»æ æ³¨ï¼ç½ä¸åå¸ AI çæå¾ç/è§é¢é¡»æç¡®æ è¯ï¼è¿è§å¤ç½ï¼AI å¹¿åé¡»æ æ³¨</td></tr>
+          <tr><td>ðºð¸ å å·</td><td>AI éæåº¦æ³æ¡ (SB-942)</td><td>2026.8.2</td><td><span class="badge badge-yes">å¼ºå¶</span></td><td>ç¾å½é¦é¨æ°´å°ä¸é¡¹æ³ï¼å¤§å AI å¹³å°é¡»æä¾åè´¹æ£æµå·¥å·ãåµå¥æ¾å¼åéå¼æ°´å°</td></tr>
+          <tr><td>ðºð¸ å¶ä»å·</td><td>ç§ç½æå¤ãç¹ä»ãä¼å©è¯ºä¼ AI éæåº¦æ³</td><td>2026.1.1</td><td><span class="badge badge-partial">é¨åå¼ºå¶</span></td><td>è¦æ± AI ä½¿ç¨éæåº¦æ«é²ï¼ä½èå´åååº¦å¼±äºå å·</td></tr>
+          <tr><td>ðºð¸ èé¦</td><td>COPIED Act / TAKE IT DOWN Act</td><td>æ¨è¿ä¸­</td><td><span class="badge badge-pending">æ¨è¿ä¸­</span></td><td>TAKE IT DOWNï¼éèªæ¿æ·±ä¼ªäº²å¯å¾åå¥åï¼COPIEDï¼æè¦æ± NIST å¶å®æ°´å°æ åï¼ç¹ææ®è¡æ¿ä»¤è¯å¾å»ºèé¦ç»ä¸æ¡æ¶</td></tr>
+          <tr><td>ð¯ðµ æ¥æ¬</td><td>ãAI ä¿è¿æ³ã</td><td>2025.6.4</td><td><span class="badge badge-partial">ååå¯¼å</span></td><td>ä¸éå¯¹çæå¼ AI åç¬ç«æ³ï¼é è¡ä¸èªå¾åç°ææ³å¾æ¡æ¶ç®¡ç</td></tr>
+          <tr><td>ð§ð· å·´è¥¿</td><td>AI æ³æ¡ (Bill No. 2338/2023)</td><td>ç«æ³ä¸­</td><td><span class="badge badge-pending">æ¨è¿ä¸­</span></td><td>åè®®é¢ 2024.12 éè¿ï¼éç¨æ¬§çå¼é£é©åçº§ï¼å«éæåº¦è¦æ±</td></tr>
+          <tr><td>ð¬ð§ è±å½</td><td>æ ä¸é¡¹æ³</td><td>â</td><td><span class="badge badge-no">èªå¾</span></td><td>ä¿è¿åæ°è·¯çº¿ï¼ä¾èµç°ææ³å¾åè¡ä¸èªå¾</td></tr>
+          <tr><td>ð¨ð¦ å æ¿å¤§</td><td>AI æ²»çå¡è®®ï¼è¿è¡ä¸­ï¼</td><td>â</td><td><span class="badge badge-pending">æ¨è¿ä¸­</span></td><td>ææ¡æ¶è®¨è®ºï¼å°æ å¼ºå¶æ§æ è¯ç«æ³</td></tr>
+          <tr><td>ð¦ðº æ¾³å¤§å©äº</td><td>AI æ²»çå¡è®®ï¼è¿è¡ä¸­ï¼</td><td>â</td><td><span class="badge badge-pending">æ¨è¿ä¸­</span></td><td>ææ¡æ¶è®¨è®ºï¼å°æ å¼ºå¶æ§æ è¯ç«æ³</td></tr>
+        </tbody>
+      </table>
+      <div class="summary-box">
+        <h3>ç«æ³æ ¼å±æ»ç»</h3>
+        <p><strong>ç¬¬ä¸æ¢¯éï¼å¼ºå¶ç«æ³å·²çæ/å³å°çæï¼ï¼</strong>ä¸­å½ï¼2025.9 å·²çæï¼ãæ¬§çï¼2026.8ï¼ãé©å½ï¼2026.1ï¼ãç¾å½å å·ï¼2026.8ï¼</p>
+        <p><strong>ç¬¬äºæ¢¯éï¼ç«æ³æ¨è¿ä¸­ï¼ï¼</strong>ç¾å½èé¦ãå·´è¥¿ãå æ¿å¤§ãæ¾³å¤§å©äº</p>
+        <p><strong>ç¬¬ä¸æ¢¯éï¼èªå¾ä¸ºä¸»ï¼ï¼</strong>æ¥æ¬ãè±å½</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">äºãåå¤§å¬å¸ C2PA å å¥æåµ</div>
+      <p style="font-size:14px; color:var(--text-secondary); margin-bottom:16px;">C2PA ç± Adobe ä¸å¾®è½¯äº 2021 å¹´èååèµ·ï¼æªè³ 2026 å¹´åæååå³èæ¹å·²è¶ 6,000 å®¶ã</p>
+
+      <div class="sub-title">æå¯¼å§åä¼æåï¼Steering Committeeï¼</div>
+      <table>
+        <thead><tr><th>å¬å¸</th><th>C2PA è§è²</th><th>å®éé¨ç½²</th></tr></thead>
+        <tbody>
+          <tr><td>Adobe</td><td><span class="badge badge-steering">èååå§/æå¯¼å§åä¼</span></td><td>Firefly å¨é¢åµå¥ Content Credentialsï¼ä¸»å¯¼ CAI</td></tr>
+          <tr><td>Microsoft</td><td><span class="badge badge-steering">èååå§/æå¯¼å§åä¼</span></td><td>Bing Image CreatorãDesigner ç­åµå¥ C2PA åæ°æ®</td></tr>
+          <tr><td>Google</td><td><span class="badge badge-steering">æå¯¼å§åä¼</span></td><td>Gemini å¸¦ C2PA æ è¯ï¼SynthID æ°´å°è¦çå¤æ¨¡æï¼"About this image"å¯æ¥çåæ°æ®</td></tr>
+          <tr><td>OpenAI</td><td><span class="badge badge-steering">æå¯¼å§åä¼</span></td><td>DALL-E 3 èªå¨åµå¥ Content Credentials</td></tr>
+          <tr><td>Meta</td><td><span class="badge badge-steering">æå¯¼å§åä¼</span></td><td>Facebook/Instagram/Threads èªå¨æ æ³¨ AI çæå¾ç</td></tr>
+          <tr><td>Amazon</td><td><span class="badge badge-steering">æå¯¼å§åä¼</span></td><td>AWS éå¼æ°´å°ç³»ç»ï¼å¹¿åå¹³å°è¦æ± AI åå®¹æ è¯</td></tr>
+          <tr><td>Sony</td><td><span class="badge badge-steering">æå¯¼å§åä¼</span></td><td>ç¸æºåºä»¶çº§ C2PA ç­¾åï¼PXW-Z300 ä¸ä¸æåæºæ¯æ</td></tr>
+          <tr><td>Intel</td><td><span class="badge badge-steering">æå¯¼å§åä¼</span></td><td>ç¡¬ä»¶å±é¢æ¯æåå®¹æº¯æºææ¯</td></tr>
+          <tr><td>Truepic</td><td><span class="badge badge-steering">æå¯¼å§åä¼</span></td><td>ä¼ä¸çº§ C2PA ç­¾ååéªè¯åºç¡è®¾æ½</td></tr>
+        </tbody>
+      </table>
+
+      <div class="sub-title">éè¦æåï¼Members / Affiliatesï¼</div>
+      <table>
+        <thead><tr><th>å¬å¸/æºæ</th><th>C2PA è§è²</th><th>å®éé¨ç½²</th></tr></thead>
+        <tbody>
+          <tr><td>BBC</td><td><span class="badge badge-member">æå</span></td><td>æ°é»åå®¹åµå¥ Content Credentials</td></tr>
+          <tr><td>Associated Press</td><td><span class="badge badge-member">æå</span></td><td>æ°é»å¾çåµå¥ C2PA åæ°æ®</td></tr>
+          <tr><td>TikTok</td><td><span class="badge badge-member">æå</span></td><td>å¹³å°ç«¯è¯å«åæ æ³¨ AI çæåå®¹</td></tr>
+          <tr><td>Canva</td><td><span class="badge badge-member">æå</span></td><td>è®¾è®¡å·¥å·ä¸­éæ Content Credentials</td></tr>
+          <tr><td>Arm</td><td><span class="badge badge-member">æå</span></td><td>è¯çæ¶æå±é¢æ¯æåå®¹æº¯æº</td></tr>
+          <tr><td>ä¸æ</td><td><span class="badge badge-member">æå</span></td><td>Galaxy S25 é¦æ¬¾æ¶è´¹çº§ææºåç C2PA ç¸æºç­¾å</td></tr>
+          <tr><td>Midjourney</td><td><span class="badge badge-member">æå</span></td><td>çæå¾çåµå¥ C2PA Content Credentials</td></tr>
+        </tbody>
+      </table>
+
+      <div class="sub-title">æªå å¥ C2PA çä¸»è¦å¬å¸</div>
+      <table>
+        <thead><tr><th>å¬å¸</th><th>ç¶æ</th><th>å¤æ³¨</th></tr></thead>
+        <tbody>
+          <tr><td>Anthropic</td><td><span class="badge badge-no">æªå å¥</span></td><td>äº§åä»¥ææ¬å¯¹è¯ä¸ºä¸»ï¼æ¬§ç AI Act 8æèµ·å¯¹ææ¬ä¹ææ è¯è¦æ±</td></tr>
+          <tr><td>X (Twitter)</td><td><span class="badge badge-no">ä¸»å¨éåº</span></td><td>é©¬æ¯åæ¥æåéåºï¼å¹³å°ä¸è¯å«ä¹ä¸æ æ³¨ AI åå®¹</td></tr>
+          <tr><td>Apple</td><td><span class="badge badge-no">æªå å¥</span></td><td>Apple Intelligence æ AI åè½ä½æªå¬å¼å å¥ C2PA</td></tr>
+          <tr><td>å­èè·³å¨ï¼å½åï¼</td><td><span class="badge badge-partial">éµå¾ªå½æ </span></td><td>TikTok å½éçå·²å å¥ï¼å½åæä¸­å½å½æ æ§è¡</td></tr>
+          <tr><td>ç¾åº¦/é¿é/è¾è®¯</td><td><span class="badge badge-partial">éµå¾ªå½æ </span></td><td>æªå å¥ C2PA å½éç»ç»ï¼æä¸­å½å¼ºå¶æ§å½æ æ§è¡</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title">ä¸ãå³é®æ¶é´çº¿</div>
+      <table>
+        <thead><tr><th>æ¶é´</th><th>äºä»¶</th></tr></thead>
+        <tbody>
+          <tr><td>2021</td><td>Adobe + Microsoft èååèµ· C2PA</td></tr>
+          <tr><td>2024.12</td><td>å·´è¥¿åè®®é¢éè¿ AI æ³æ¡</td></tr>
+          <tr><td>2025.5</td><td>ç¾å½èé¦ TAKE IT DOWN Act ç­¾ç½²</td></tr>
+          <tr><td>2025.6</td><td>æ¥æ¬ãAI ä¿è¿æ³ãçæ</td></tr>
+          <tr><td>2025.9</td><td>ä¸­å½ãAI çæåæåå®¹æ è¯åæ³ã+ å¼ºå¶æ§å½æ çæ</td></tr>
+          <tr><td>2025.10</td><td>C2PA åè§è®¤è¯è®¡åä¸çº¿</td></tr>
+          <tr><td>2025.12</td><td>ç¹ææ®ç­¾ç½²èé¦ AI æ¿ç­æ¡æ¶è¡æ¿ä»¤ï¼C2PA æåè¶ 6,000 å®¶</td></tr>
+          <tr><td>2026.1</td><td>é©å½ãAI åºæ¬æ³ãçæï¼ç¾å½å¤å· AI éæåº¦æ³çæï¼ä¸æ Galaxy S25 åç C2PA</td></tr>
+          <tr><td>2026.6</td><td>æ¬§çæ æ³¨å®è·µååå®ç¨¿</td></tr>
+          <tr><td>2026.8.2</td><td>â­ æ¬§ç AI Act ç¬¬50æ¡ + å å· SB-942 æ­£å¼çæ</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="footer">
+      æ°æ®æ¥æºï¼C2PA å®ç½ãContent Authenticity Initiativeãåå½æ¿åºå¬æ¥ãå¬å¼æ¥é Â· ç± Claude æ´çäº 2026.4.7
+    </div>
+  </div>
+</div>
+
+<!-- ===== Tab Switch Script ===== -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Stats
+    document.getElementById('day-count').textContent = document.querySelectorAll('.day-section').length;
+    document.getElementById('news-count').textContent = document.querySelectorAll('.news-item').length;
+
+    // Tab switching
+    var tabs = document.querySelectorAll('.nav-tab');
+    tabs.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        tabs.forEach(function(t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+        document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+        document.getElementById('page-' + tab.dataset.page).classList.add('active');
+        window.scrollTo(0, 0);
+      });
+    });
+
+    // URL hash support
+    if (window.location.hash === '#c2pa') {
+      document.querySelector('[data-page="c2pa"]').click();
+    }
+  });
+</script>
+</body>
+</html>
