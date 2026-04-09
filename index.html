@@ -5,464 +5,989 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Insight Hub</title>
 <style>
-  :root {
-    --bg: #18181b; --surface: #27272a; --border: #3f3f46;
-    --text: #fafafa; --text-secondary: #a1a1aa;
-    --accent: #a78bfa; --accent2: #ec4899; --accent-dim: #7c3aed;
-    --tag-model: linear-gradient(135deg, #3b82f6, #6366f1);
-    --tag-startup: linear-gradient(135deg, #10b981, #34d399);
-    --tag-policy: linear-gradient(135deg, #f59e0b, #fbbf24);
-    --tag-research: linear-gradient(135deg, #ec4899, #f472b6);
-    --tag-hardware: linear-gradient(135deg, #f97316, #fb923c);
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    background: var(--bg); color: var(--text); line-height: 1.7;
-  }
+:root {
+  --bg:#0f0f11; --surface:#1a1a1f; --surface2:#222228;
+  --border:#2e2e36; --border2:#3a3a44;
+  --text:#f0f0f2; --text-sec:#8b8b9a; --text-muted:#5a5a6a;
+  --accent:#a78bfa; --accent2:#ec4899;
+  --c-model:#6366f1; --c-research:#ec4899;
+  --c-hardware:#f97316; --c-startup:#10b981; --c-policy:#f59e0b;
+  --nav-h:50px;
+  --tl-w:60px;   /* timeline rail width */
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.6;font-size:14px;
+  overflow-x:hidden;
+}
 
-  /* ===== Top Nav ===== */
-  .top-nav {
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(24,24,27,0.85); backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: 0 16px;
-  }
-  .nav-inner {
-    max-width: 900px; margin: 0 auto;
-    display: flex; align-items: center; gap: 24px;
-    height: 56px;
-  }
-  .nav-logo {
-    font-size: 18px; font-weight: 700; white-space: nowrap;
-    background: linear-gradient(135deg, #a78bfa, #ec4899);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  }
-  .nav-tabs { display: flex; gap: 4px; }
-  .nav-tab {
-    padding: 8px 18px; border-radius: 8px; font-size: 14px; font-weight: 500;
-    color: var(--text-secondary); cursor: pointer; transition: all 0.2s;
-    border: 1px solid transparent; user-select: none;
-  }
-  .nav-tab:hover { color: var(--text); background: rgba(167,139,250,0.08); }
-  .nav-tab.active {
-    color: #fff; background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(236,72,153,0.15));
-    border-color: rgba(167,139,250,0.3);
-  }
+/* ══ Nav ══ */
+.top-nav{
+  position:sticky;top:0;z-index:200;
+  background:rgba(15,15,17,0.94);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+}
+.nav-inner{
+  max-width:860px;margin:0 auto;padding:0 20px;
+  display:flex;align-items:center;gap:20px;height:var(--nav-h);
+}
+.nav-logo{
+  font-size:15px;font-weight:700;white-space:nowrap;flex-shrink:0;
+  background:linear-gradient(135deg,#a78bfa,#ec4899);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.nav-tabs{display:flex;gap:2px;}
+.nav-tab{
+  padding:6px 14px;border-radius:6px;font-size:13px;font-weight:500;
+  color:var(--text-sec);cursor:pointer;transition:all .15s;
+  border:1px solid transparent;user-select:none;
+}
+.nav-tab:hover{color:var(--text);background:rgba(255,255,255,.05);}
+.nav-tab.active{
+  color:#fff;
+  background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(236,72,153,.12));
+  border-color:rgba(167,139,250,.25);
+}
 
-  /* ===== Page container ===== */
-  .page { display: none; padding: 0 16px; }
-  .page.active { display: block; }
-  .container { max-width: 900px; margin: 0 auto; padding-bottom: 80px; }
+/* ══ App shell ══ */
+.app{display:flex;position:relative;}
 
-  /* ===== Page 1: Daily Archive ===== */
-  .page-header { padding: 40px 0 28px; border-bottom: 1px solid var(--border); text-align: center; }
-  .page-header h1 {
-    font-size: 26px; font-weight: 700;
-    background: linear-gradient(135deg, #a78bfa, #ec4899, #f97316);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  }
-  .page-header p { color: var(--text-secondary); font-size: 13px; margin-top: 8px; }
-  .stats { display: flex; justify-content: center; gap: 32px; margin-top: 16px; }
-  .stat-item { text-align: center; }
-  .stat-num {
-    font-size: 24px; font-weight: 700;
-    background: linear-gradient(135deg, #a78bfa, #ec4899);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  }
-  .stat-label { font-size: 12px; color: var(--text-secondary); }
+/* ══ Pages ══ */
+.page{display:none;flex:1;min-width:0;}
+.page.active{display:block;}
 
-  .day-section { margin-top: 40px; padding-bottom: 40px; border-bottom: 1px solid var(--border); }
-  .day-section:last-child { border-bottom: none; }
-  .day-date {
-    font-size: 20px; font-weight: 600;
-    background: linear-gradient(90deg, #a78bfa, #ec4899);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
-  }
-  .day-date::before {
-    content: ""; display: inline-block; width: 4px; height: 22px;
-    background: linear-gradient(180deg, #a78bfa, #ec4899); border-radius: 2px;
-  }
-  .news-item {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 10px; padding: 18px 20px; margin-bottom: 12px; transition: all 0.2s;
-  }
-  .news-item:hover { border-color: var(--accent); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-  .news-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
-  .news-title a { color: #e0e7ff; text-decoration: none; transition: color 0.2s; }
-  .news-title a:hover { color: var(--accent); }
-  .news-summary { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
-  .news-tag {
-    display: inline-block; font-size: 11px; font-weight: 600;
-    padding: 2px 10px; border-radius: 20px; margin-right: 6px; margin-bottom: 8px; color: #fff;
-  }
-  .tag-model { background: var(--tag-model); }
-  .tag-startup { background: var(--tag-startup); }
-  .tag-policy { background: var(--tag-policy); }
-  .tag-research { background: var(--tag-research); }
-  .tag-hardware { background: var(--tag-hardware); }
+.page-inner{
+  max-width:820px;margin:0 auto;
+  padding:0 20px 100px;
+  /* right padding makes room for the timeline on wide screens */
+}
 
-  /* ===== Page 2: C2PA Report ===== */
-  .section { margin-top: 40px; }
-  .section-title {
-    font-size: 20px; font-weight: 700; margin-bottom: 20px;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .section-title::before {
-    content: ""; display: inline-block; width: 4px; height: 24px;
-    background: linear-gradient(180deg, var(--accent), var(--accent2)); border-radius: 2px;
-  }
-  .sub-title {
-    font-size: 16px; font-weight: 600; color: var(--accent);
-    margin: 24px 0 12px; padding-left: 14px;
-    border-left: 3px solid var(--accent);
-  }
-  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
-  thead th {
-    background: #2d2d35; color: var(--accent); font-weight: 600;
-    padding: 12px 14px; text-align: left; border-bottom: 2px solid var(--border); white-space: nowrap;
-  }
-  tbody td {
-    padding: 11px 14px; border-bottom: 1px solid var(--border);
-    color: var(--text-secondary); vertical-align: top;
-  }
-  tbody tr:hover { background: rgba(167,139,250,0.06); }
-  tbody td:first-child { color: var(--text); font-weight: 500; white-space: nowrap; }
-  .badge {
-    display: inline-block; font-size: 11px; font-weight: 600;
-    padding: 2px 10px; border-radius: 20px; color: #fff; white-space: nowrap;
-  }
-  .badge-yes { background: linear-gradient(135deg, #10b981, #34d399); }
-  .badge-partial { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
-  .badge-no { background: linear-gradient(135deg, #ef4444, #f87171); }
-  .badge-pending { background: linear-gradient(135deg, #6366f1, #818cf8); }
-  .badge-steering { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
-  .badge-member { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
-  .summary-box {
-    background: linear-gradient(135deg, rgba(167,139,250,0.1), rgba(236,72,153,0.1));
-    border: 1px solid rgba(167,139,250,0.3);
-    border-radius: 12px; padding: 20px 24px; margin: 24px 0;
-  }
-  .summary-box h3 { font-size: 15px; font-weight: 600; margin-bottom: 10px; color: var(--accent); }
-  .summary-box p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
-  .footer {
-    margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border);
-    font-size: 12px; color: #52525b; text-align: center;
-  }
+/* ══ Timeline Rail ══ */
+#tl-rail{
+  position:fixed;
+  right:0;top:var(--nav-h);bottom:0;
+  width:var(--tl-w);
+  z-index:100;
+  display:flex;flex-direction:column;align-items:center;
+  padding:16px 0 24px;
+  pointer-events:none; /* children opt in */
+}
+/* hide on narrow screens */
+@media(max-width:780px){#tl-rail{display:none;}}
 
-  @media (max-width: 700px) {
-    .nav-logo { font-size: 15px; }
-    .nav-tab { padding: 6px 12px; font-size: 13px; }
-    table { font-size: 12px; }
-    thead th, tbody td { padding: 8px 10px; }
-    .page-header h1 { font-size: 22px; }
-    .news-item { padding: 14px 16px; }
-  }
+.tl-track{
+  position:relative;
+  flex:1;width:100%;
+  display:flex;flex-direction:column;align-items:center;
+  pointer-events:all;cursor:pointer;
+  user-select:none;
+}
+
+/* the thin vertical line */
+.tl-track::before{
+  content:"";position:absolute;
+  left:50%;top:0;bottom:0;
+  width:2px;transform:translateX(-50%);
+  background:var(--border2);
+  border-radius:2px;
+}
+
+/* draggable thumb */
+.tl-thumb{
+  position:absolute;left:50%;top:0;
+  transform:translateX(-50%);
+  width:10px;height:10px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#a78bfa,#ec4899);
+  box-shadow:0 0 8px rgba(167,139,250,.6);
+  transition:top .1s;
+  pointer-events:none;
+  z-index:2;
+}
+
+/* floating label next to thumb while dragging */
+.tl-scrub-label{
+  position:absolute;right:calc(50% + 10px);top:0;
+  transform:translateY(-50%);
+  background:var(--surface2);border:1px solid var(--border2);
+  color:var(--text);font-size:11px;font-weight:600;
+  padding:3px 8px;border-radius:6px;white-space:nowrap;
+  opacity:0;transition:opacity .15s;pointer-events:none;
+  z-index:3;
+}
+.tl-track.dragging .tl-scrub-label{opacity:1;}
+.tl-track.dragging .tl-thumb{width:12px;height:12px;}
+
+/* year label at top */
+.tl-year{
+  font-size:10px;font-weight:700;color:var(--text-muted);
+  letter-spacing:.06em;margin-bottom:6px;
+}
+
+/* month group */
+.tl-month-group{
+  width:100%;position:relative;
+  display:flex;flex-direction:column;align-items:center;
+}
+.tl-month-label{
+  font-size:9px;color:var(--text-muted);
+  background:var(--bg);padding:2px 4px;
+  border-radius:4px;margin:4px 0 2px;
+  z-index:1;position:relative;
+  pointer-events:none;
+}
+
+/* entry dot */
+.tl-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--border2);
+  margin:3px 0;position:relative;z-index:1;
+  transition:all .15s;flex-shrink:0;
+}
+.tl-dot:hover{transform:scale(1.6);background:var(--accent);}
+.tl-dot.active{
+  width:8px;height:8px;
+  background:linear-gradient(135deg,#a78bfa,#ec4899);
+  box-shadow:0 0 6px rgba(167,139,250,.5);
+  margin:2px 0;
+}
+
+/* dot tooltip */
+.tl-dot::after{
+  content:attr(data-label);
+  position:absolute;right:calc(100% + 8px);top:50%;
+  transform:translateY(-50%);
+  font-size:10px;color:var(--text-sec);white-space:nowrap;
+  opacity:0;pointer-events:none;transition:opacity .1s;
+  background:var(--surface2);border:1px solid var(--border2);
+  padding:2px 6px;border-radius:4px;
+}
+.tl-dot:hover::after{opacity:1;}
+
+/* ══ Page 1: Daily ══ */
+.page-header{
+  padding:24px 0 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.page-header h1{
+  font-size:19px;font-weight:700;
+  background:linear-gradient(135deg,#a78bfa,#ec4899);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.header-meta{display:flex;gap:10px;align-items:center;}
+.stat-badge{
+  font-size:12px;color:var(--text-muted);
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;padding:3px 10px;
+}
+.stat-badge strong{color:var(--accent);font-weight:600;}
+
+/* filter chips */
+.filter-bar{
+  display:flex;gap:6px;align-items:center;
+  padding:12px 0 0;flex-wrap:wrap;
+}
+.filter-label{font-size:11px;color:var(--text-muted);margin-right:2px;}
+.chip{
+  font-size:12px;font-weight:500;padding:3px 11px;
+  border-radius:20px;cursor:pointer;transition:all .15s;
+  border:1px solid var(--border);background:var(--surface);
+  color:var(--text-sec);user-select:none;
+}
+.chip:hover{border-color:var(--border2);color:var(--text);}
+.chip.active{color:#fff;border-color:transparent;}
+.chip[data-cat="all"].active{background:linear-gradient(135deg,#a78bfa,#ec4899);}
+.chip[data-cat="model"].active   {background:var(--c-model);}
+.chip[data-cat="research"].active{background:var(--c-research);}
+.chip[data-cat="hardware"].active{background:var(--c-hardware);}
+.chip[data-cat="startup"].active {background:var(--c-startup);}
+.chip[data-cat="policy"].active  {background:var(--c-policy);}
+
+/* day block */
+.day-block{margin-top:20px;}
+.day-block.hidden{display:none;}
+.day-divider{height:1px;background:var(--border);margin-bottom:14px;}
+.day-header{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:10px;cursor:pointer;user-select:none;
+}
+.day-title{
+  font-size:14px;font-weight:600;
+  background:linear-gradient(90deg,#a78bfa,#ec4899);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.day-count{
+  font-size:11px;color:var(--text-muted);
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;padding:1px 7px;
+}
+.day-toggle{margin-left:auto;font-size:11px;color:var(--text-muted);transition:transform .2s;}
+.day-block.collapsed .day-toggle{transform:rotate(-90deg);}
+.day-block.collapsed .day-body{display:none;}
+
+/* category group */
+.cat-group{margin-bottom:8px;}
+.cat-group.hidden{display:none;}
+.cat-header{
+  display:flex;align-items:center;gap:7px;
+  padding:5px 0 7px;font-size:11px;font-weight:600;
+  color:var(--text-sec);text-transform:uppercase;letter-spacing:.06em;
+}
+.cat-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.cat-count{font-size:10px;color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0;}
+
+/* news grid */
+.news-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:2px;}
+
+/* news item */
+.ni{
+  background:var(--surface);border:1px solid var(--border);
+  border-left:3px solid transparent;
+  border-radius:8px;padding:10px 12px;
+  transition:all .15s;
+}
+.ni:hover{border-color:var(--border2);background:var(--surface2);transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.25);}
+.ni[data-cat="model"]   {border-left-color:var(--c-model);}
+.ni[data-cat="research"]{border-left-color:var(--c-research);}
+.ni[data-cat="hardware"]{border-left-color:var(--c-hardware);}
+.ni[data-cat="startup"] {border-left-color:var(--c-startup);}
+.ni[data-cat="policy"]  {border-left-color:var(--c-policy);}
+.ni.hidden{display:none;}
+.ni-title{font-size:13px;font-weight:600;line-height:1.4;margin-bottom:4px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.ni-title a{color:#e0e7ff;text-decoration:none;}
+.ni-title a:hover{color:var(--accent);}
+.ni-summary{font-size:12px;color:var(--text-sec);line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+
+/* ══ Page 2: Weekly ══ */
+.wk-header{
+  padding:24px 0 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+}
+.wk-issue{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;}
+.wk-title{font-size:19px;font-weight:700;
+  background:linear-gradient(135deg,#a78bfa,#ec4899,#f97316);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.wk-daterange{font-size:12px;color:var(--text-muted);margin-top:4px;}
+.wk-auto-badge{flex-shrink:0;font-size:11px;color:var(--text-muted);
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;padding:3px 10px;margin-top:4px;white-space:nowrap;}
+
+.wk-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0;}
+.wk-stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 12px;text-align:center;}
+.wk-stat-num{font-size:20px;font-weight:700;line-height:1.1;
+  background:linear-gradient(135deg,#a78bfa,#ec4899);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.wk-stat-label{font-size:11px;color:var(--text-muted);margin-top:3px;}
+
+.wk-section{margin-top:24px;}
+.wk-section-title{
+  font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text-muted);margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.wk-section-title::after{content:"";flex:1;height:1px;background:var(--border);}
+
+.wk-highlights{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.wk-hl{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;padding:13px 15px;transition:all .15s;
+}
+.wk-hl:hover{border-color:var(--border2);background:var(--surface2);}
+.wk-hl.featured{
+  grid-column:span 2;
+  background:linear-gradient(135deg,rgba(99,102,241,.1),rgba(167,139,250,.06));
+  border-color:rgba(99,102,241,.3);
+}
+.wk-hl-badge{
+  font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  padding:2px 8px;border-radius:20px;color:#fff;display:inline-block;margin-bottom:7px;
+}
+.wk-hl-badge.top{background:linear-gradient(135deg,#a78bfa,#ec4899);}
+.wk-hl-badge.model   {background:var(--c-model);}
+.wk-hl-badge.research{background:var(--c-research);}
+.wk-hl-badge.hardware{background:var(--c-hardware);}
+.wk-hl-badge.startup {background:var(--c-startup);}
+.wk-hl-badge.policy  {background:var(--c-policy);}
+.wk-hl-title{font-size:13px;font-weight:600;line-height:1.4;margin-bottom:5px;color:#e0e7ff;}
+.wk-hl.featured .wk-hl-title{font-size:14px;}
+.wk-hl-desc{font-size:12px;color:var(--text-sec);line-height:1.55;}
+.wk-hl-source{font-size:11px;color:var(--text-muted);margin-top:5px;}
+.wk-hl-source a{color:var(--accent);text-decoration:none;}
+.wk-hl-source a:hover{text-decoration:underline;}
+
+.wk-cats{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.wk-cat{
+  background:var(--surface);border:1px solid var(--border);
+  border-left:3px solid transparent;border-radius:8px;padding:11px 13px;
+}
+.wk-cat[data-cat="model"]   {border-left-color:var(--c-model);}
+.wk-cat[data-cat="research"]{border-left-color:var(--c-research);}
+.wk-cat[data-cat="hardware"]{border-left-color:var(--c-hardware);}
+.wk-cat[data-cat="startup"] {border-left-color:var(--c-startup);}
+.wk-cat[data-cat="policy"]  {border-left-color:var(--c-policy);}
+.wk-cat-head{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.wk-cat-name{font-size:12px;font-weight:600;}
+.wk-cat-count{margin-left:auto;font-size:11px;color:var(--text-muted);background:var(--surface2);border-radius:10px;padding:1px 7px;}
+.wk-cat-body{font-size:12px;color:var(--text-sec);line-height:1.6;}
+.wk-cat-picks{margin-top:6px;display:flex;flex-direction:column;gap:3px;}
+.wk-cat-pick{font-size:11px;color:var(--text-muted);padding-left:10px;border-left:2px solid var(--border2);line-height:1.4;}
+.wk-cat-pick a{color:var(--text-sec);text-decoration:none;}
+.wk-cat-pick a:hover{color:var(--accent);text-decoration:underline;}
+
+.wk-trends{display:flex;flex-direction:column;gap:7px;}
+.wk-trend{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:11px 13px;display:flex;gap:11px;align-items:flex-start;}
+.wk-trend-icon{font-size:18px;flex-shrink:0;line-height:1;margin-top:1px;}
+.wk-trend-title{font-size:13px;font-weight:600;margin-bottom:4px;}
+.wk-trend-body{font-size:12px;color:var(--text-sec);line-height:1.55;}
+
+/* ══ Page 3: C2PA ══ */
+.c2pa-header{padding:24px 0 16px;border-bottom:1px solid var(--border);}
+.c2pa-header h1{font-size:19px;font-weight:700;
+  background:linear-gradient(135deg,#a78bfa,#ec4899);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.c2pa-header p{color:var(--text-sec);font-size:12px;margin-top:5px;}
+.section{margin-top:28px;}
+.section-title{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.section-title::before{content:"";display:inline-block;width:3px;height:17px;
+  background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:2px;}
+.sub-title{font-size:13px;font-weight:600;color:var(--accent);
+  margin:18px 0 9px;padding-left:11px;border-left:2px solid var(--accent);}
+table{width:100%;border-collapse:collapse;margin:10px 0 18px;font-size:13px;}
+thead th{background:var(--surface);color:var(--accent);font-weight:600;
+  padding:9px 11px;text-align:left;border-bottom:1px solid var(--border2);white-space:nowrap;}
+tbody td{padding:8px 11px;border-bottom:1px solid var(--border);color:var(--text-sec);vertical-align:top;}
+tbody tr:hover{background:rgba(167,139,250,.04);}
+tbody td:first-child{color:var(--text);font-weight:500;white-space:nowrap;}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;color:#fff;white-space:nowrap;}
+.badge-yes    {background:#10b981;} .badge-partial{background:#f59e0b;}
+.badge-no     {background:#ef4444;} .badge-pending{background:#6366f1;}
+.badge-steering{background:#8b5cf6;} .badge-member{background:#3b82f6;}
+.summary-box{
+  background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(236,72,153,.05));
+  border:1px solid rgba(167,139,250,.18);border-radius:9px;padding:14px 18px;margin:14px 0;
+}
+.summary-box h3{font-size:13px;font-weight:600;margin-bottom:7px;color:var(--accent);}
+.summary-box p{font-size:12px;color:var(--text-sec);line-height:1.6;margin-bottom:3px;}
+.footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--border);font-size:11px;color:var(--text-muted);text-align:center;}
+
+@media(max-width:600px){
+  .news-grid,.wk-highlights,.wk-cats,.wk-stats{grid-template-columns:1fr;}
+  .wk-hl.featured{grid-column:span 1;}
+  .page-header,.wk-header{flex-direction:column;align-items:flex-start;gap:8px;}
+}
 </style>
 </head>
 <body>
 
-<!-- ===== Top Navigation ===== -->
 <nav class="top-nav">
   <div class="nav-inner">
     <div class="nav-logo">AI Insight Hub</div>
     <div class="nav-tabs">
       <div class="nav-tab active" data-page="daily">AI 日报</div>
+      <div class="nav-tab" data-page="weekly">周报</div>
       <div class="nav-tab" data-page="c2pa">立法 & C2PA</div>
     </div>
   </div>
 </nav>
 
-<!-- ===== Page 1: AI Daily Archive ===== -->
+<!-- Timeline Rail -->
+<div id="tl-rail">
+  <div class="tl-year" id="tl-year-label">2026</div>
+  <div class="tl-track" id="tl-track">
+    <div class="tl-thumb" id="tl-thumb"></div>
+    <div class="tl-scrub-label" id="tl-scrub-label"></div>
+  </div>
+</div>
+
+<div class="app">
+
+<!-- ═══════ Page 1: Daily Archive ═══════ -->
 <div class="page active" id="page-daily">
-  <div class="container">
-    <div class="page-header">
-      <h1>AI 日报归档</h1>
-      <p>每日 AI 行业大事件 · 自动采集 · 持续更新</p>
-      <div class="stats">
-        <div class="stat-item"><div class="stat-num" id="day-count">0</div><div class="stat-label">天数</div></div>
-        <div class="stat-item"><div class="stat-num" id="news-count">0</div><div class="stat-label">条新闻</div></div>
-      </div>
+<div class="page-inner">
+  <div class="page-header">
+    <h1>AI 日报归档</h1>
+    <div class="header-meta">
+      <div class="stat-badge"><strong id="day-count">0</strong> 天</div>
+      <div class="stat-badge"><strong id="news-count">0</strong> 条新闻</div>
     </div>
-    <div id="archive">
+  </div>
+  <div class="filter-bar">
+    <span class="filter-label">筛选：</span>
+    <span class="chip active" data-cat="all">全部</span>
+    <span class="chip" data-cat="model">🤖 大模型</span>
+    <span class="chip" data-cat="research">🔬 技术前沿</span>
+    <span class="chip" data-cat="hardware">💻 AI硬件</span>
+    <span class="chip" data-cat="startup">🚀 AI创业</span>
+    <span class="chip" data-cat="policy">📋 政策安全</span>
+  </div>
+
+  <div id="archive">
+
 <!-- ARCHIVE_INSERT_POINT -->
-    <div class="day-section">
-      <div class="day-date">2026年4月8日</div>
-      <div class="news-item">
-        <div><span class="news-tag tag-model">大模型</span></div>
-        <div class="news-title"><a href="https://markets.financialcontent.com/stocks/article/marketminute-2026-4-8-meta-unleashes-llama-5-zuckerbergs-open-source-gambit-challenges-proprietary-ai-dominance" target="_blank">Meta 发布 Llama 5 开源大模型</a></div>
-        <div class="news-summary">扎克伯格正式发布 Llama 5，开源策略挑战闭源模型主导地位</div>
+  <div class="day-block" id="day-2026-04-08" data-date="2026-04-08">
+    <div class="day-divider"></div>
+    <div class="day-header">
+      <div class="day-title">2026年4月8日</div>
+      <div class="day-count">14条</div>
+      <div class="day-toggle">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="cat-group" data-cat="model">
+        <div class="cat-header"><div class="cat-dot" style="background:var(--c-model)"></div>大模型<span class="cat-count">4条</span></div>
+        <div class="news-grid">
+          <div class="ni" data-cat="model"><div class="ni-title"><a href="https://markets.financialcontent.com/stocks/article/marketminute-2026-4-8-meta-unleashes-llama-5-zuckerbergs-open-source-gambit-challenges-proprietary-ai-dominance" target="_blank">Meta 发布 Llama 5 开源大模型</a></div><div class="ni-summary">扎克伯格正式发布 Llama 5，开源策略挑战闭源模型主导地位</div></div>
+          <div class="ni" data-cat="model"><div class="ni-title"><a href="https://whatllm.org/blog/new-ai-models-april-2026" target="_blank">Anthropic 推出 Claude Mythos 前沿模型</a></div><div class="ni-summary">10 万亿参数，推理与网络安全能力大幅跃升，通过 Project Glasswing 限量开放</div></div>
+          <div class="ni" data-cat="model"><div class="ni-title"><a href="https://llm-stats.com/llm-updates" target="_blank">DeepSeek 发布 R2 推理模型</a></div><div class="ni-summary">AIME 2025 得分 92.7%，媲美 OpenAI o3，API 价格低 70%</div></div>
+          <div class="ni" data-cat="model"><div class="ni-title"><a href="https://www.humai.blog/ai-news-trends-april-2026-complete-monthly-digest/" target="_blank">Google DeepMind 发布 Gemini 3.1</a></div><div class="ni-summary">新增实时语音与图像分析能力，多模态性能再升级</div></div>
+        </div>
       </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-model">大模型</span></div>
-        <div class="news-title"><a href="https://whatllm.org/blog/new-ai-models-april-2026" target="_blank">Anthropic 推出 Claude Mythos 前沿模型</a></div>
-        <div class="news-summary">10 万亿参数，推理与网络安全能力大幅跃升，通过 Project Glasswing 限量开放</div>
+      <div class="cat-group" data-cat="research">
+        <div class="cat-header"><div class="cat-dot" style="background:var(--c-research)"></div>技术前沿<span class="cat-count">3条</span></div>
+        <div class="news-grid">
+          <div class="ni" data-cat="research"><div class="ni-title"><a href="https://www.technologyreview.com/2026/01/12/1130003/mechanistic-interpretability-ai-research-models-2026-breakthrough-technologies/" target="_blank">机械可解释性入选 MIT 2026 十大突破技术</a></div><div class="ni-summary">Anthropic、OpenAI、DeepMind 均在探索模型内部推理路径的可视化与追踪</div></div>
+          <div class="ni" data-cat="research"><div class="ni-title"><a href="https://www.sciencedaily.com/releases/2026/04/260405003952.htm" target="_blank">新算法将 AI 能耗降低 100 倍并提升准确率</a></div><div class="ni-summary">结合神经网络与符号推理，有望大幅降低 AI 基础设施能源消耗</div></div>
+          <div class="ni" data-cat="research"><div class="ni-title"><a href="https://www.crescendo.ai/news/latest-ai-news-and-updates" target="_blank">Google TurboQuant 算法亮相 ICLR 2026</a></div><div class="ni-summary">通过向量旋转+JL 压缩两步法显著减少 KV Cache 内存开销</div></div>
+        </div>
       </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-model">大模型</span></div>
-        <div class="news-title"><a href="https://llm-stats.com/llm-updates" target="_blank">DeepSeek 发布 R2 推理模型</a></div>
-        <div class="news-summary">AIME 2025 得分 92.7%，媲美 OpenAI o3，API 价格低 70%</div>
+      <div class="cat-group" data-cat="hardware">
+        <div class="cat-header"><div class="cat-dot" style="background:var(--c-hardware)"></div>AI 硬件<span class="cat-count">3条</span></div>
+        <div class="news-grid">
+          <div class="ni" data-cat="hardware"><div class="ni-title"><a href="https://nvidianews.nvidia.com/news/rubin-platform-ai-supercomputer" target="_blank">NVIDIA 发布 Rubin 平台：6 款新芯片</a></div><div class="ni-summary">推理性能提升 5 倍、训练性能提升 3.5 倍，下半年量产</div></div>
+          <div class="ni" data-cat="hardware"><div class="ni-title"><a href="https://newsroom.intel.com/client-computing/ces-2026-intel-core-ultra-series-3-debut-first-built-on-intel-18a" target="_blank">Intel 18A 工艺 Core Ultra Series 3 处理器发布</a></div><div class="ni-summary">首款基于 Intel 18A 工艺的 AI PC 平台，美国本土设计与制造</div></div>
+          <div class="ni" data-cat="hardware"><div class="ni-title"><a href="https://www.amd.com/en/newsroom/press-releases/2026-1-5-amd-and-its-partners-share-their-vision-for-ai-ev.html" target="_blank">AMD 发布 Instinct MI440X，预览 MI500 系列</a></div><div class="ni-summary">MI500 系列计划 2027 年发布，AI 性能较 MI300X 提升 1000 倍</div></div>
+        </div>
       </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-model">大模型</span></div>
-        <div class="news-title"><a href="https://www.humai.blog/ai-news-trends-april-2026-complete-monthly-digest/" target="_blank">Google DeepMind 发布 Gemini 3.1</a></div>
-        <div class="news-summary">新增实时语音与图像分析能力，多模态性能再升级</div>
+      <div class="cat-group" data-cat="startup">
+        <div class="cat-header"><div class="cat-dot" style="background:var(--c-startup)"></div>AI 创业<span class="cat-count">2条</span></div>
+        <div class="news-grid">
+          <div class="ni" data-cat="startup"><div class="ni-title"><a href="https://news.crunchbase.com/venture/record-breaking-funding-ai-global-q1-2026/" target="_blank">Q1 2026 全球 VC 投资 3000 亿美元创历史新高</a></div><div class="ni-summary">AI 占总融资 80%，OpenAI/Anthropic/xAI/Waymo 四家合计融资 1880 亿美元</div></div>
+          <div class="ni" data-cat="startup"><div class="ni-title"><a href="https://nvidianews.nvidia.com/news/ai-agents" target="_blank">NVIDIA 发布企业 AI Agent 开放平台</a></div><div class="ni-summary">Adobe、Salesforce、SAP 等 17 家企业首批采用，含开源安全运行时 OpenShell</div></div>
+        </div>
       </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-research">研究</span></div>
-        <div class="news-title"><a href="https://www.technologyreview.com/2026/01/12/1130003/mechanistic-interpretability-ai-research-models-2026-breakthrough-technologies/" target="_blank">机械可解释性入选 MIT 2026 十大突破技术</a></div>
-        <div class="news-summary">Anthropic、OpenAI、DeepMind 均在探索模型内部推理路径的可视化与追踪</div>
-      </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-research">研究</span></div>
-        <div class="news-title"><a href="https://www.sciencedaily.com/releases/2026/04/260405003952.htm" target="_blank">新算法将 AI 能耗降低 100 倍并提升准确率</a></div>
-        <div class="news-summary">结合神经网络与符号推理，有望大幅降低 AI 基础设施能源消耗</div>
-      </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-research">研究</span></div>
-        <div class="news-title"><a href="https://www.crescendo.ai/news/latest-ai-news-and-updates" target="_blank">Google TurboQuant 算法亮相 ICLR 2026</a></div>
-        <div class="news-summary">通过向量旋转+JL 压缩两步法显著减少 KV Cache 内存开销</div>
-      </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-hardware">硬件</span></div>
-        <div class="news-title"><a href="https://nvidianews.nvidia.com/news/rubin-platform-ai-supercomputer" target="_blank">NVIDIA 发布 Rubin 平台：6 款新芯片</a></div>
-        <div class="news-summary">推理性能提升 5 倍、训练性能提升 3.5 倍，下半年量产</div>
-      </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-hardware">硬件</span></div>
-        <div class="news-title"><a href="https://newsroom.intel.com/client-computing/ces-2026-intel-core-ultra-series-3-debut-first-built-on-intel-18a" target="_blank">Intel 18A 工艺 Core Ultra Series 3 处理器发布</a></div>
-        <div class="news-summary">首款基于 Intel 18A 工艺的 AI PC 平台，美国本土设计与制造</div>
-      </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-hardware">硬件</span></div>
-        <div class="news-title"><a href="https://www.amd.com/en/newsroom/press-releases/2026-1-5-amd-and-its-partners-share-their-vision-for-ai-ev.html" target="_blank">AMD 发布 Instinct MI440X，预览 MI500 系列</a></div>
-        <div class="news-summary">MI500 系列计划 2027 年发布，AI 性能较 MI300X 提升 1000 倍</div>
-      </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-startup">创业</span></div>
-        <div class="news-title"><a href="https://news.crunchbase.com/venture/record-breaking-funding-ai-global-q1-2026/" target="_blank">Q1 2026 全球 VC 投资 3000 亿美元创历史新高</a></div>
-        <div class="news-summary">AI 占总融资 80%，OpenAI/Anthropic/xAI/Waymo 四家合计融资 1880 亿美元</div>
-      </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-startup">创业</span></div>
-        <div class="news-title"><a href="https://nvidianews.nvidia.com/news/ai-agents" target="_blank">NVIDIA 发布企业 AI Agent 开放平台</a></div>
-        <div class="news-summary">Adobe、Salesforce、SAP 等 17 家企业首批采用，含开源安全运行时 OpenShell</div>
-      </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-policy">政策</span></div>
-        <div class="news-title"><a href="https://www.bloomberg.com/news/articles/2026-04-06/openai-anthropic-google-unite-to-combat-model-copying-in-china" target="_blank">OpenAI、Anthropic、Google 联合打击中国模型蒸馏</a></div>
-        <div class="news-summary">三巨头通过 Frontier Model Forum 共享情报，Anthropic 已封禁三家中国实验室</div>
-      </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-policy">政策</span></div>
-        <div class="news-title"><a href="https://www.ropesgray.com/en/insights/alerts/2026/03/the-white-house-legislative-recommendations-national-policy-framework-for-artificial-intelligence-an" target="_blank">白宫发布 AI 国家政策框架，推动联邦统一监管</a></div>
-        <div class="news-summary">主张"轻触式"监管，拟以联邦法律优先于各州 AI 法规</div>
+      <div class="cat-group" data-cat="policy">
+        <div class="cat-header"><div class="cat-dot" style="background:var(--c-policy)"></div>政策安全<span class="cat-count">2条</span></div>
+        <div class="news-grid">
+          <div class="ni" data-cat="policy"><div class="ni-title"><a href="https://www.bloomberg.com/news/articles/2026-04-06/openai-anthropic-google-unite-to-combat-model-copying-in-china" target="_blank">OpenAI、Anthropic、Google 联合打击中国模型蒸馏</a></div><div class="ni-summary">三巨头通过 Frontier Model Forum 共享情报，Anthropic 已封禁三家中国实验室</div></div>
+          <div class="ni" data-cat="policy"><div class="ni-title"><a href="https://www.ropesgray.com/en/insights/alerts/2026/03/the-white-house-legislative-recommendations-national-policy-framework-for-artificial-intelligence-an" target="_blank">白宫发布 AI 国家政策框架，推动联邦统一监管</a></div><div class="ni-summary">主张"轻触式"监管，拟以联邦法律优先于各州 AI 法规</div></div>
+        </div>
       </div>
     </div>
+  </div><!-- /day-block 2026-04-08 -->
 
-    <div class="day-section">
-      <div class="day-date">2026年4月7日</div>
-      <div class="news-item">
-        <div><span class="news-tag tag-model">大模型</span></div>
-        <div class="news-title"><a href="https://ai.meta.com/blog/llama-5/" target="_blank">Meta 正式发布 Llama 5 开源大模型，挑战闭源 AI 主导地位</a></div>
-        <div class="news-summary">扎克伯格宣布 Llama 5 正式发布，多项基准测试超越 GPT-5.4 和 Claude Opus，作为开源旗舰模型向所有开发者免费开放。Meta 同步推出配套微调工具链，进一步降低企业部署门槛。</div>
+  <div class="day-block" id="day-2026-04-07" data-date="2026-04-07">
+    <div class="day-divider"></div>
+    <div class="day-header">
+      <div class="day-title">2026年4月7日</div>
+      <div class="day-count">13条</div>
+      <div class="day-toggle">▾</div>
+    </div>
+    <div class="day-body">
+      <div class="cat-group" data-cat="model">
+        <div class="cat-header"><div class="cat-dot" style="background:var(--c-model)"></div>大模型<span class="cat-count">4条</span></div>
+        <div class="news-grid">
+          <div class="ni" data-cat="model"><div class="ni-title"><a href="https://ai.meta.com/blog/llama-5/" target="_blank">Meta 正式发布 Llama 5，挑战闭源 AI 主导地位</a></div><div class="ni-summary">多项基准测试超越 GPT-5.4 和 Claude Opus，开源旗舰向所有开发者免费开放。同步推出微调工具链，进一步降低企业部署门槛。</div></div>
+          <div class="ni" data-cat="model"><div class="ni-title"><a href="https://www.anthropic.com/news/claude-mythos" target="_blank">Anthropic Claude Mythos 曝光：10 万亿参数，专攻网络安全与编程</a></div><div class="ni-summary">通过 Project Glasswing 向约 50 家合作机构定向开放，在推理、编程和零日漏洞检测方面实现跨越式提升。</div></div>
+          <div class="ni" data-cat="model"><div class="ni-title"><a href="https://deepseek.com/r2" target="_blank">DeepSeek 发布 R2 推理模型，AIME 数学推理得分 92.7%</a></div><div class="ni-summary">在 AIME 2025 测试中达到 92.7% 准确率，媲美 OpenAI o3。API 定价仅为同级西方模型的 30%。</div></div>
+          <div class="ni" data-cat="model"><div class="ni-title"><a href="https://blog.google/technology/google-deepmind/gemma-4/" target="_blank">Google 发布开源 Gemma 4，Mistral 推出 Large 3 旗舰模型</a></div><div class="ni-summary">Gemma 4 覆盖 4B 到 27B 多个尺寸；Mistral Large 3 大幅提升结构化输出和函数调用能力，支持欧盟数据驻留合规要求。</div></div>
+        </div>
       </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-model">大模型</span></div>
-        <div class="news-title"><a href="https://www.anthropic.com/news/claude-mythos" target="_blank">Anthropic Claude Mythos 曝光：10 万亿参数，专攻网络安全与编程</a></div>
-        <div class="news-summary">Anthropic 最新旗舰模型 Mythos 通过 Project Glasswing 向约 50 家合作机构定向开放，在推理、编程和零日漏洞检测方面实现跨越式提升。据悉参数量达 10 万亿，是现有最大规模商业模型之一。</div>
+      <div class="cat-group" data-cat="research">
+        <div class="cat-header"><div class="cat-dot" style="background:var(--c-research)"></div>技术前沿<span class="cat-count">3条</span></div>
+        <div class="news-grid">
+          <div class="ni" data-cat="research"><div class="ni-title"><a href="https://www.technologyreview.com/2026/04/07/mechanistic-interpretability/" target="_blank">机械可解释性入选 MIT 2026 十大突破技术</a></div><div class="ni-summary">《MIT 技术评论》将机械可解释性列为年度十大突破技术。三大实验室均在探索模型内部推理路径可视化方法。</div></div>
+          <div class="ni" data-cat="research"><div class="ni-title"><a href="https://arxiv.org/abs/2604.03721" target="_blank">神经-符号混合算法将 AI 能耗降低 100 倍，推动边缘部署</a></div><div class="ni-summary">斯坦福研究团队提出将神经网络与符号推理结合的混合架构，在逻辑推理任务上能耗降至原有的 1%。</div></div>
+          <div class="ni" data-cat="research"><div class="ni-title"><a href="https://research.google/pubs/turboquant/" target="_blank">Google TurboQuant 量化技术发布，大模型推理速度提升 3 倍</a></div><div class="ni-summary">新型后训练量化技术，70B 以上大模型推理速度提升 3 倍，内存占用降低 60%，已集成到 Google Cloud TPU。</div></div>
+        </div>
       </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-model">大模型</span></div>
-        <div class="news-title"><a href="https://deepseek.com/r2" target="_blank">DeepSeek 发布 R2 推理模型，AIME 数学推理得分 92.7%</a></div>
-        <div class="news-summary">中国 AI 实验室 DeepSeek 推出 R2 推理模型，在 AIME 2025 测试中达到 92.7% 准确率，媲美 OpenAI o3。API 定价仅为同级西方模型的 30%，再次引发行业对成本竞争的讨论。</div>
+      <div class="cat-group" data-cat="hardware">
+        <div class="cat-header"><div class="cat-dot" style="background:var(--c-hardware)"></div>AI 硬件<span class="cat-count">2条</span></div>
+        <div class="news-grid">
+          <div class="ni" data-cat="hardware"><div class="ni-title"><a href="https://nvidianews.nvidia.com/rubin/" target="_blank">NVIDIA Rubin 平台正式量产，算力达 3.6 EFLOPS</a></div><div class="ni-summary">单机柜算力达 3.6 EFLOPS，较 Blackwell 提升约 4 倍。首批客户包括微软、谷歌、亚马逊，交付预计 2026 Q3。</div></div>
+          <div class="ni" data-cat="hardware"><div class="ni-title"><a href="https://www.intel.com/18a-ai/" target="_blank">Intel 18A 工艺流片成功，为 AI 芯片自研提供新选项</a></div><div class="ni-summary">Intel 18A 先进制程首批流片成功，良率符合量产标准。多家 AI 芯片初创公司已签约采用 18A 工艺定制化生产。</div></div>
+        </div>
       </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-model">大模型</span></div>
-        <div class="news-title"><a href="https://blog.google/technology/google-deepmind/gemma-4/" target="_blank">Google 发布开源 Gemma 4，Mistral 推出 Large 3 旗舰模型</a></div>
-        <div class="news-summary">Google DeepMind 发布新一代开源 Gemma 4 系列，覆盖 4B 到 27B 多个尺寸；Mistral AI 同日发布 Large 3，大幅提升结构化输出和函数调用能力，并支持欧盟数据驻留合规要求。</div>
+      <div class="cat-group" data-cat="startup">
+        <div class="cat-header"><div class="cat-dot" style="background:var(--c-startup)"></div>AI 创业<span class="cat-count">2条</span></div>
+        <div class="news-grid">
+          <div class="ni" data-cat="startup"><div class="ni-title"><a href="https://venturebeat.com/2026/q1-ai-funding/" target="_blank">2026 年 Q1 全球 AI 风投达 2420 亿美元，占全球总量 80%</a></div><div class="ni-summary">同比增长 340%，Agent 基础设施、AI 安全和垂直行业应用是融资热点。</div></div>
+          <div class="ni" data-cat="startup"><div class="ni-title"><a href="https://www.alibabacloud.com/wukong-agent/" target="_blank">阿里巴巴推出悟空 Agent 平台，支持千亿参数模型工具调用</a></div><div class="ni-summary">阿里云发布悟空企业级 Agent 开发平台，面向政务、金融、制造等行业推出定制化方案。</div></div>
+        </div>
       </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-research">技术前沿</span></div>
-        <div class="news-title"><a href="https://www.technologyreview.com/2026/04/07/mechanistic-interpretability/" target="_blank">机械可解释性入选 MIT 2026 十大突破技术</a></div>
-        <div class="news-summary">《MIT 技术评论》将机械可解释性列为 2026 年十大突破性技术之一。Anthropic、OpenAI、DeepMind 均在探索模型内部推理路径的可视化方法，旨在让 AI 决策过程更透明可审计。</div>
+      <div class="cat-group" data-cat="policy">
+        <div class="cat-header"><div class="cat-dot" style="background:var(--c-policy)"></div>政策安全<span class="cat-count">2条</span></div>
+        <div class="news-grid">
+          <div class="ni" data-cat="policy"><div class="ni-title"><a href="https://openai.com/blog/anti-distillation-coalition/" target="_blank">OpenAI、Anthropic、Google 联手打击模型蒸馏，发布联合声明</a></div><div class="ni-summary">三大 AI 巨头将共同采取技术和法律手段打击未经授权的模型蒸馏行为，加强 API 行为监控并更新服务条款。</div></div>
+          <div class="ni" data-cat="policy"><div class="ni-title"><a href="https://whitehouse.gov/ai-policy-2026/" target="_blank">白宫发布 AI 国家政策框架，要求联邦机构强制评估 AI 风险</a></div><div class="ni-summary">要求所有联邦机构在 180 天内完成高风险 AI 系统的风险评估，建立统一采购标准，提供"监管沙箱"机制。</div></div>
+        </div>
       </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-research">技术前沿</span></div>
-        <div class="news-title"><a href="https://arxiv.org/abs/2604.03721" target="_blank">神经-符号混合算法将 AI 能耗降低 100 倍，推动边缘部署</a></div>
-        <div class="news-summary">斯坦福研究团队发表论文，提出将神经网络与符号推理结合的混合架构，在特定逻辑推理任务上能耗降至原有的 1%，同等精度下显著减少计算资源需求，为端侧 AI 部署带来新思路。</div>
+    </div>
+  </div><!-- /day-block 2026-04-07 -->
+
+
+    </div><!-- /archive -->
+</div><!-- /page-inner -->
+</div><!-- /page-daily -->
+
+
+<!-- ═══════ Page 2: Weekly Report ═══════ -->
+<div class="page" id="page-weekly">
+<div class="page-inner">
+<!-- WEEKLY_INSERT_POINT -->
+  <div class="week-block" id="week-2026-W15" data-week="2026-W15" data-label="4月第2周">
+  <div class="wk-header">
+    <div>
+      <div class="wk-issue">Vol.1 · 第 1 期</div>
+      <div class="wk-title">AI 周报</div>
+      <div class="wk-daterange">2026年4月7日 — 2026年4月13日</div>
+    </div>
+    <div class="wk-auto-badge">⚡ 每周一自动生成</div>
+  </div>
+
+  <div class="wk-stats">
+    <div class="wk-stat"><div class="wk-stat-num">27</div><div class="wk-stat-label">本周新闻</div></div>
+    <div class="wk-stat"><div class="wk-stat-num">8</div><div class="wk-stat-label">重大发布</div></div>
+    <div class="wk-stat"><div class="wk-stat-num">3000亿</div><div class="wk-stat-label">融资金额（美元）</div></div>
+    <div class="wk-stat"><div class="wk-stat-num">5</div><div class="wk-stat-label">新模型上线</div></div>
+  </div>
+
+  <div class="wk-section">
+    <div class="wk-section-title">本周要点</div>
+    <div class="wk-highlights">
+      <div class="wk-hl featured">
+        <div class="wk-hl-badge top">🏆 本周最重要</div>
+        <div class="wk-hl-title">开源 vs 闭源格局重塑：Meta Llama 5 正面超越 GPT-5.4</div>
+        <div class="wk-hl-desc">本周 AI 圈最大震荡来自 Meta。Llama 5 在多项权威基准上超越 GPT-5.4 和 Claude Opus，并以完全开源的方式向所有开发者免费开放。这是开源 AI 首次在旗舰级能力上正面超越商业闭源模型，标志着"能力平权"时代到来。与此同时，Anthropic 的 Claude Mythos（10 万亿参数）仅向 50 家安全领域机构定向开放，两种路径的分野在本周愈发清晰。</div>
+        <div class="wk-hl-source"><a href="https://ai.meta.com/blog/llama-5/" target="_blank">→ Meta AI Blog</a> &nbsp;·&nbsp; <a href="https://www.anthropic.com/news/claude-mythos" target="_blank">→ Anthropic</a></div>
       </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-research">技术前沿</span></div>
-        <div class="news-title"><a href="https://research.google/pubs/turboquant/" target="_blank">Google TurboQuant 量化技术发布，大模型推理速度提升 3 倍</a></div>
-        <div class="news-summary">Google Research 发布 TurboQuant，一种新型后训练量化技术，可在几乎不损失精度的情况下将 70B 以上大模型的推理速度提升 3 倍，内存占用降低 60%，已集成到 Google Cloud TPU 环境中。</div>
+      <div class="wk-hl">
+        <div class="wk-hl-badge hardware">AI 硬件</div>
+        <div class="wk-hl-title">NVIDIA Rubin 量产，单机柜 3.6 EFLOPS</div>
+        <div class="wk-hl-desc">算力较 Blackwell 提升 4 倍，微软、谷歌、亚马逊首批签单，2026 Q3 交付。下一代 AI 基础设施军备赛进入新阶段。</div>
+        <div class="wk-hl-source"><a href="https://nvidianews.nvidia.com/rubin/" target="_blank">→ NVIDIA Newsroom</a></div>
       </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-hardware">AI硬件</span></div>
-        <div class="news-title"><a href="https://nvidianews.nvidia.com/rubin/" target="_blank">NVIDIA Rubin 平台正式量产，算力达 3.6 EFLOPS</a></div>
-        <div class="news-summary">NVIDIA 宣布面向超大规模数据中心的 Rubin GPU 平台正式进入量产阶段，单机柜算力达 3.6 EFLOPS，较 Blackwell 提升约 4 倍。首批客户包括微软、谷歌、亚马逊，交付预计 2026 Q3 完成。</div>
+      <div class="wk-hl">
+        <div class="wk-hl-badge startup">AI 创业</div>
+        <div class="wk-hl-title">Q1 全球 AI 风投 3000 亿美元，占全行业 80%</div>
+        <div class="wk-hl-desc">AI 吸走了几乎所有 VC 资金。四家头部公司单季合计融资 1880 亿美元，Agent 基础设施成最热赛道。</div>
+        <div class="wk-hl-source"><a href="https://news.crunchbase.com/venture/record-breaking-funding-ai-global-q1-2026/" target="_blank">→ Crunchbase News</a></div>
       </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-hardware">AI硬件</span></div>
-        <div class="news-title"><a href="https://www.intel.com/18a-ai/" target="_blank">Intel 18A 工艺流片成功，为 AI 芯片自研提供新选项</a></div>
-        <div class="news-summary">Intel 宣布 18A 先进制程首批流片成功，工艺性能达到预期，良率符合量产标准。这是 Intel 重返制造领先地位的关键节点，多家 AI 芯片初创公司已签约采用 18A 工艺进行定制化生产。</div>
+      <div class="wk-hl">
+        <div class="wk-hl-badge research">技术前沿</div>
+        <div class="wk-hl-title">AI 能耗降低 100 倍：神经-符号混合架构突破</div>
+        <div class="wk-hl-desc">斯坦福团队论文显示，混合架构在逻辑推理任务上能耗仅为纯神经网络的 1%，为边缘侧大模型部署打开新空间。</div>
+        <div class="wk-hl-source"><a href="https://arxiv.org/abs/2604.03721" target="_blank">→ arXiv 论文</a></div>
       </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-startup">AI创业</span></div>
-        <div class="news-title"><a href="https://venturebeat.com/2026/q1-ai-funding/" target="_blank">2026 年 Q1 全球 AI 风投达 2420 亿美元，占全球总量 80%</a></div>
-        <div class="news-summary">CB Insights 最新报告显示，2026 年第一季度全球 AI 领域融资额达 2420 亿美元，同比增长 340%，占全球所有行业风险投资总额的 80%。Agent 基础设施、AI 安全和垂直行业应用是融资热点。</div>
-      </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-startup">AI创业</span></div>
-        <div class="news-title"><a href="https://www.alibabacloud.com/wukong-agent/" target="_blank">阿里巴巴推出悟空 Agent 平台，支持千亿参数模型工具调用</a></div>
-        <div class="news-summary">阿里云正式发布悟空企业级 Agent 开发平台，支持与通义千问等千亿参数模型深度集成，提供开箱即用的工具调用、记忆管理和多 Agent 协作能力，面向政务、金融、制造等行业推出定制化方案。</div>
-      </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-policy">政策安全</span></div>
-        <div class="news-title"><a href="https://openai.com/blog/anti-distillation-coalition/" target="_blank">OpenAI、Anthropic、Google 联手打击模型蒸馏，发布联合声明</a></div>
-        <div class="news-summary">三大 AI 巨头联合发布声明，宣布将共同采取技术和法律手段打击未经授权的模型蒸馏行为。具体措施包括加强 API 行为监控、更新服务条款，以及向相关国家监管机构提交立法建议。</div>
-      </div>
-      <div class="news-item">
-        <div><span class="news-tag tag-policy">政策安全</span></div>
-        <div class="news-title"><a href="https://whitehouse.gov/ai-policy-2026/" target="_blank">白宫发布 AI 国家政策框架，要求联邦机构强制评估 AI 风险</a></div>
-        <div class="news-summary">白宫科技政策办公室发布《2026 年美国 AI 国家行动框架》，要求所有联邦机构在 180 天内完成高风险 AI 系统的风险评估，并建立统一的 AI 采购标准。框架同时为 AI 创新提供"监管沙箱"机制。</div>
+      <div class="wk-hl">
+        <div class="wk-hl-badge policy">政策安全</div>
+        <div class="wk-hl-title">三巨头联合反蒸馏 + 白宫 AI 政策框架同周落地</div>
+        <div class="wk-hl-desc">OpenAI、Anthropic、Google 联手封禁；白宫同步要求联邦机构 180 天内完成 AI 风险评估。监管收紧信号明显。</div>
+        <div class="wk-hl-source"><a href="https://openai.com/blog/anti-distillation-coalition/" target="_blank">→ OpenAI Blog</a> &nbsp;·&nbsp; <a href="https://whitehouse.gov/ai-policy-2026/" target="_blank">→ 白宫框架</a></div>
       </div>
     </div>
   </div>
-</div>
-</div>
 
-<!-- ===== Page 2: C2PA & Legislation Report ===== -->
+  <div class="wk-section">
+    <div class="wk-section-title">分类回顾</div>
+    <div class="wk-cats">
+      <div class="wk-cat" data-cat="model">
+        <div class="wk-cat-head"><span>🤖</span><span class="wk-cat-name">大模型</span><span class="wk-cat-count">8条</span></div>
+        <div class="wk-cat-body">本周是近半年模型发布最密集的一周。开源侧 Llama 5、DeepSeek R2、Gemma 4、Mistral Large 3 集中亮相；闭源侧 Claude Mythos 定向开放、Gemini 3.1 升级多模态能力。竞争节奏已从季度迭代进入周级迭代。</div>
+        <div class="wk-cat-picks">
+          <div class="wk-cat-pick"><a href="https://ai.meta.com/blog/llama-5/" target="_blank">Llama 5 多项基准超越 GPT-5.4 和 Claude Opus</a></div>
+          <div class="wk-cat-pick"><a href="https://deepseek.com/r2" target="_blank">DeepSeek R2 API 价格仅为西方同级模型 30%</a></div>
+          <div class="wk-cat-pick"><a href="https://www.anthropic.com/news/claude-mythos" target="_blank">Claude Mythos 10 万亿参数，专攻安全与编程</a></div>
+        </div>
+      </div>
+      <div class="wk-cat" data-cat="research">
+        <div class="wk-cat-head"><span>🔬</span><span class="wk-cat-name">技术前沿</span><span class="wk-cat-count">6条</span></div>
+        <div class="wk-cat-body">效率与可解释性是本周技术侧两条主线。TurboQuant 推理提速 3×，神经-符号混合将能耗降至 1%；机械可解释性入选 MIT 十大突破技术，该方向已从学术小众走向行业主流。</div>
+        <div class="wk-cat-picks">
+          <div class="wk-cat-pick"><a href="https://www.technologyreview.com/2026/04/07/mechanistic-interpretability/" target="_blank">机械可解释性入选 MIT 2026 十大突破技术</a></div>
+          <div class="wk-cat-pick"><a href="https://research.google/pubs/turboquant/" target="_blank">TurboQuant：70B 以上推理提速 3×，内存 -60%</a></div>
+          <div class="wk-cat-pick"><a href="https://arxiv.org/abs/2604.03721" target="_blank">神经-符号混合：同精度下能耗降低 99%</a></div>
+        </div>
+      </div>
+      <div class="wk-cat" data-cat="hardware">
+        <div class="wk-cat-head"><span>💻</span><span class="wk-cat-name">AI 硬件</span><span class="wk-cat-count">5条</span></div>
+        <div class="wk-cat-body">算力军备赛本周加速。NVIDIA Rubin 量产；Intel 18A 流片成功，重返先进制程竞争；AMD 预览 MI500。三大芯片厂商齐发，算力供给侧将在 2026 Q3-Q4 集中释放。</div>
+        <div class="wk-cat-picks">
+          <div class="wk-cat-pick"><a href="https://nvidianews.nvidia.com/rubin/" target="_blank">Rubin 单机柜 3.6 EFLOPS，较 Blackwell 提升 4×</a></div>
+          <div class="wk-cat-pick"><a href="https://www.intel.com/18a-ai/" target="_blank">Intel 18A 流片成功，多家 AI 芯片初创已签约</a></div>
+          <div class="wk-cat-pick"><a href="https://www.amd.com/en/newsroom/press-releases/2026-1-5-amd-and-its-partners-share-their-vision-for-ai-ev.html" target="_blank">AMD MI500 预览：AI 性能较 MI300X 提升 1000×</a></div>
+        </div>
+      </div>
+      <div class="wk-cat" data-cat="startup">
+        <div class="wk-cat-head"><span>🚀</span><span class="wk-cat-name">AI 创业</span><span class="wk-cat-count">4条</span></div>
+        <div class="wk-cat-body">资本仍在疯狂涌入。Q1 AI 风投 3000 亿美元打破纪录，占全行业 80%。融资热点已从大模型本身转向 Agent 基础设施、AI 安全工具和垂直行业应用——产业化落地正成为新主线。</div>
+        <div class="wk-cat-picks">
+          <div class="wk-cat-pick"><a href="https://news.crunchbase.com/venture/record-breaking-funding-ai-global-q1-2026/" target="_blank">Q1 全球 AI VC 3000 亿美元，同比 +340%</a></div>
+          <div class="wk-cat-pick"><a href="https://nvidianews.nvidia.com/news/ai-agents" target="_blank">NVIDIA Agent 平台获 Adobe/Salesforce 等 17 家采用</a></div>
+          <div class="wk-cat-pick"><a href="https://www.alibabacloud.com/wukong-agent/" target="_blank">阿里悟空 Agent 平台面向政务、金融、制造落地</a></div>
+        </div>
+      </div>
+      <div class="wk-cat" data-cat="policy">
+        <div class="wk-cat-head"><span>📋</span><span class="wk-cat-name">政策安全</span><span class="wk-cat-count">4条</span></div>
+        <div class="wk-cat-body">监管与对抗在本周双线推进。三大模型厂商联手反蒸馏是近年最大集体行动；白宫要求 180 天内落实联邦 AI 风险评估，合规压力正快速升温。</div>
+        <div class="wk-cat-picks">
+          <div class="wk-cat-pick"><a href="https://www.bloomberg.com/news/articles/2026-04-06/openai-anthropic-google-unite-to-combat-model-copying-in-china" target="_blank">Anthropic 已封禁 3 家中国 AI 实验室 API 访问</a></div>
+          <div class="wk-cat-pick"><a href="https://whitehouse.gov/ai-policy-2026/" target="_blank">白宫框架：联邦机构 180 天内完成高风险 AI 评估</a></div>
+          <div class="wk-cat-pick"><a href="https://www.ropesgray.com/en/insights/alerts/2026/03/the-white-house-legislative-recommendations-national-policy-framework-for-artificial-intelligence-an" target="_blank">欧盟 AI Act 第 50 条 + 加州 SB-942 倒计时 2026.8.2</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wk-section">
+    <div class="wk-section-title">本周趋势观察</div>
+    <div class="wk-trends">
+      <div class="wk-trend"><div class="wk-trend-icon">⚡</div><div><div class="wk-trend-title">开源能力拐点已至，闭源护城河正在缩窄</div><div class="wk-trend-body">Llama 5 超越 GPT-5.4 不是偶然——DeepSeek R2 以 30% 的价格匹敌 o3，Gemma 4 覆盖从手机到服务器的全尺寸段。闭源模型的差异化正从"能力"转向"安全合规"和"垂直深度整合"，这一赛道切换的速度比预期快了至少一年。</div></div></div>
+      <div class="wk-trend"><div class="wk-trend-icon">💰</div><div><div class="wk-trend-title">AI 投资进入"基础设施超级周期"</div><div class="wk-trend-body">Q1 3000 亿美元 VC + 三大芯片厂商同步扩产，这与互联网时期的基础设施投资周期高度相似。不同的是，这轮的需求端——企业 AI 采购——目前仍然真实且快速增长。但算力供给侧在 2026 Q3-Q4 将集中释放，关注供需是否会出现短暂错位。</div></div></div>
+      <div class="wk-trend"><div class="wk-trend-icon">🔐</div><div><div class="wk-trend-title">AI 监管从"立法"进入"执行"阶段</div><div class="wk-trend-body">欧盟 AI Act 第 50 条和加州 SB-942 同步倒计时至 2026.8.2，白宫也开始要求联邦机构落实评估。一个过去一年密集发布框架文件的周期正在结束，接下来的 12 个月将是真正的合规压力测试期，企业 AI 治理团队的重要性将急剧上升。</div></div></div>
+    </div>
+  </div>
+  </div><!-- /week-block -->
+
+</div><!-- /page-inner -->
+</div><!-- /page-weekly -->
+
+
+<!-- ═══════ Page 3: C2PA ═══════ -->
 <div class="page" id="page-c2pa">
-  <div class="container">
-    <div class="page-header">
-      <h1>全球 AI 内容标识立法与 C2PA 加入情况</h1>
-      <p>更新日期：2026 年 4 月 7 日</p>
-    </div>
-
-    <div class="section">
-      <div class="section-title">一、全球 AI 生成内容标识立法情况</div>
-      <table>
-        <thead><tr><th>国家/地区</th><th>法规名称</th><th>生效时间</th><th>强制程度</th><th>核心要求</th></tr></thead>
-        <tbody>
-          <tr><td>🇨🇳 中国</td><td>《人工智能生成合成内容标识办法》+ 强制性国标</td><td>2025.9.1</td><td><span class="badge badge-yes">强制</span></td><td>所有 AI 生成内容须在元数据中添加隐式标识，鼓励数字水印；配套服务平台 GCmark 已上线</td></tr>
-          <tr><td>🇪🇺 欧盟</td><td>EU AI Act 第50条 + 标注实践准则</td><td>2026.8.2</td><td><span class="badge badge-yes">强制</span></td><td>AI 生成的文本/图片/音频/视频须以机器可读方式标识；三层方案：C2PA 元数据 + 像素级水印 + 日志系统</td></tr>
-          <tr><td>🇰🇷 韩国</td><td>《AI 基本法》+ 广告标识修正案</td><td>2026.1.22</td><td><span class="badge badge-yes">强制</span></td><td>AI 生成内容须标注；网上发布 AI 生成图片/视频须明确标识，违规处罚；AI 广告须标注</td></tr>
-          <tr><td>🇺🇸 加州</td><td>AI 透明度法案 (SB-942)</td><td>2026.8.2</td><td><span class="badge badge-yes">强制</span></td><td>美国首部水印专项法；大型 AI 平台须提供免费检测工具、嵌入显式和隐式水印</td></tr>
-          <tr><td>🇺🇸 其他州</td><td>科罗拉多、犹他、伊利诺伊 AI 透明度法</td><td>2026.1.1</td><td><span class="badge badge-partial">部分强制</span></td><td>要求 AI 使用透明度披露，但范围和力度弱于加州</td></tr>
-          <tr><td>🇺🇸 联邦</td><td>COPIED Act / TAKE IT DOWN Act</td><td>推进中</td><td><span class="badge badge-pending">推进中</span></td><td>TAKE IT DOWN：非自愿深伪亲密图像入刑；COPIED：拟要求 NIST 制定水印标准；特朗普行政令试图建联邦统一框架</td></tr>
-          <tr><td>🇯🇵 日本</td><td>《AI 促进法》</td><td>2025.6.4</td><td><span class="badge badge-partial">原则导向</span></td><td>不针对生成式 AI 单独立法；靠行业自律和现有法律框架管理</td></tr>
-          <tr><td>🇧🇷 巴西</td><td>AI 法案 (Bill No. 2338/2023)</td><td>立法中</td><td><span class="badge badge-pending">推进中</span></td><td>参议院 2024.12 通过，采用欧盟式风险分级，含透明度要求</td></tr>
-          <tr><td>🇬🇧 英国</td><td>无专项法</td><td>—</td><td><span class="badge badge-no">自律</span></td><td>促进创新路线，依赖现有法律和行业自律</td></tr>
-          <tr><td>🇨🇦 加拿大</td><td>AI 治理倡议（进行中）</td><td>—</td><td><span class="badge badge-pending">推进中</span></td><td>有框架讨论，尚无强制性标识立法</td></tr>
-          <tr><td>🇦🇺 澳大利亚</td><td>AI 治理倡议（进行中）</td><td>—</td><td><span class="badge badge-pending">推进中</span></td><td>有框架讨论，尚无强制性标识立法</td></tr>
-        </tbody>
-      </table>
-      <div class="summary-box">
-        <h3>立法格局总结</h3>
-        <p><strong>第一梯队（强制立法已生效/即将生效）：</strong>中国（2025.9 已生效）、欧盟（2026.8）、韩国（2026.1）、美国加州（2026.8）</p>
-        <p><strong>第二梯队（立法推进中）：</strong>美国联邦、巴西、加拿大、澳大利亚</p>
-        <p><strong>第三梯队（自律为主）：</strong>日本、英国</p>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">二、各大公司 C2PA 加入情况</div>
-      <p style="font-size:14px; color:var(--text-secondary); margin-bottom:16px;">C2PA 由 Adobe 与微软于 2021 年联合发起，截至 2026 年初成员及关联方已超 6,000 家。</p>
-
-      <div class="sub-title">指导委员会成员（Steering Committee）</div>
-      <table>
-        <thead><tr><th>公司</th><th>C2PA 角色</th><th>实际部署</th></tr></thead>
-        <tbody>
-          <tr><td>Adobe</td><td><span class="badge badge-steering">联合创始/指导委员会</span></td><td>Firefly 全面嵌入 Content Credentials；主导 CAI</td></tr>
-          <tr><td>Microsoft</td><td><span class="badge badge-steering">联合创始/指导委员会</span></td><td>Bing Image Creator、Designer 等嵌入 C2PA 元数据</td></tr>
-          <tr><td>Google</td><td><span class="badge badge-steering">指导委员会</span></td><td>Gemini 带 C2PA 标识；SynthID 水印覆盖多模态；"About this image"可查看元数据</td></tr>
-          <tr><td>OpenAI</td><td><span class="badge badge-steering">指导委员会</span></td><td>DALL-E 3 自动嵌入 Content Credentials</td></tr>
-          <tr><td>Meta</td><td><span class="badge badge-steering">指导委员会</span></td><td>Facebook/Instagram/Threads 自动标注 AI 生成图片</td></tr>
-          <tr><td>Amazon</td><td><span class="badge badge-steering">指导委员会</span></td><td>AWS 隐式水印系统；广告平台要求 AI 内容标识</td></tr>
-          <tr><td>Sony</td><td><span class="badge badge-steering">指导委员会</span></td><td>相机固件级 C2PA 签名；PXW-Z300 专业摄像机支持</td></tr>
-          <tr><td>Intel</td><td><span class="badge badge-steering">指导委员会</span></td><td>硬件层面支持内容溯源技术</td></tr>
-          <tr><td>Truepic</td><td><span class="badge badge-steering">指导委员会</span></td><td>企业级 C2PA 签名和验证基础设施</td></tr>
-        </tbody>
-      </table>
-
-      <div class="sub-title">重要成员（Members / Affiliates）</div>
-      <table>
-        <thead><tr><th>公司/机构</th><th>C2PA 角色</th><th>实际部署</th></tr></thead>
-        <tbody>
-          <tr><td>BBC</td><td><span class="badge badge-member">成员</span></td><td>新闻内容嵌入 Content Credentials</td></tr>
-          <tr><td>Associated Press</td><td><span class="badge badge-member">成员</span></td><td>新闻图片嵌入 C2PA 元数据</td></tr>
-          <tr><td>TikTok</td><td><span class="badge badge-member">成员</span></td><td>平台端识别和标注 AI 生成内容</td></tr>
-          <tr><td>Canva</td><td><span class="badge badge-member">成员</span></td><td>设计工具中集成 Content Credentials</td></tr>
-          <tr><td>Arm</td><td><span class="badge badge-member">成员</span></td><td>芯片架构层面支持内容溯源</td></tr>
-          <tr><td>三星</td><td><span class="badge badge-member">成员</span></td><td>Galaxy S25 首款消费级手机原生 C2PA 相机签名</td></tr>
-          <tr><td>Midjourney</td><td><span class="badge badge-member">成员</span></td><td>生成图片嵌入 C2PA Content Credentials</td></tr>
-        </tbody>
-      </table>
-
-      <div class="sub-title">未加入 C2PA 的主要公司</div>
-      <table>
-        <thead><tr><th>公司</th><th>状态</th><th>备注</th></tr></thead>
-        <tbody>
-          <tr><td>Anthropic</td><td><span class="badge badge-no">未加入</span></td><td>产品以文本对话为主；欧盟 AI Act 8月起对文本也有标识要求</td></tr>
-          <tr><td>X (Twitter)</td><td><span class="badge badge-no">主动退出</span></td><td>马斯克接手后退出，平台不识别也不标注 AI 内容</td></tr>
-          <tr><td>Apple</td><td><span class="badge badge-no">未加入</span></td><td>Apple Intelligence 有 AI 功能但未公开加入 C2PA</td></tr>
-          <tr><td>字节跳动（国内）</td><td><span class="badge badge-partial">遵循国标</span></td><td>TikTok 国际版已加入；国内按中国国标执行</td></tr>
-          <tr><td>百度/阿里/腾讯</td><td><span class="badge badge-partial">遵循国标</span></td><td>未加入 C2PA 国际组织，按中国强制性国标执行</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="section">
-      <div class="section-title">三、关键时间线</div>
-      <table>
-        <thead><tr><th>时间</th><th>事件</th></tr></thead>
-        <tbody>
-          <tr><td>2021</td><td>Adobe + Microsoft 联合发起 C2PA</td></tr>
-          <tr><td>2024.12</td><td>巴西参议院通过 AI 法案</td></tr>
-          <tr><td>2025.5</td><td>美国联邦 TAKE IT DOWN Act 签署</td></tr>
-          <tr><td>2025.6</td><td>日本《AI 促进法》生效</td></tr>
-          <tr><td>2025.9</td><td>中国《AI 生成合成内容标识办法》+ 强制性国标生效</td></tr>
-          <tr><td>2025.10</td><td>C2PA 合规认证计划上线</td></tr>
-          <tr><td>2025.12</td><td>特朗普签署联邦 AI 政策框架行政令；C2PA 成员超 6,000 家</td></tr>
-          <tr><td>2026.1</td><td>韩国《AI 基本法》生效；美国多州 AI 透明度法生效；三星 Galaxy S25 原生 C2PA</td></tr>
-          <tr><td>2026.6</td><td>欧盟标注实践准则定稿</td></tr>
-          <tr><td>2026.8.2</td><td>⭐ 欧盟 AI Act 第50条 + 加州 SB-942 正式生效</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="footer">
-      数据来源：C2PA 官网、Content Authenticity Initiative、各国政府公报、公开报道 · 由 Claude 整理于 2026.4.7
+<div class="page-inner">
+  <div class="c2pa-header">
+    <h1>全球 AI 内容标识立法与 C2PA 加入情况</h1>
+    <p>更新日期：2026 年 4 月 7 日 · 每周一自动更新</p>
+  </div>
+  <div class="section">
+    <div class="section-title">一、全球 AI 生成内容标识立法情况</div>
+    <table><thead><tr><th>国家/地区</th><th>法规名称</th><th>生效时间</th><th>强制程度</th><th>核心要求</th></tr></thead>
+    <tbody>
+      <tr><td>🇨🇳 中国</td><td>《人工智能生成合成内容标识办法》+ 强制性国标</td><td>2025.9.1</td><td><span class="badge badge-yes">强制</span></td><td>所有 AI 生成内容须在元数据中添加隐式标识，鼓励数字水印；配套服务平台 GCmark 已上线</td></tr>
+      <tr><td>🇪🇺 欧盟</td><td>EU AI Act 第50条 + 标注实践准则</td><td>2026.8.2</td><td><span class="badge badge-yes">强制</span></td><td>AI 生成的文本/图片/音频/视频须以机器可读方式标识；三层方案：C2PA 元数据 + 像素级水印 + 日志系统</td></tr>
+      <tr><td>🇰🇷 韩国</td><td>《AI 基本法》+ 广告标识修正案</td><td>2026.1.22</td><td><span class="badge badge-yes">强制</span></td><td>AI 生成内容须标注；网上发布 AI 生成图片/视频须明确标识；AI 广告须标注</td></tr>
+      <tr><td>🇺🇸 加州</td><td>AI 透明度法案 (SB-942)</td><td>2026.8.2</td><td><span class="badge badge-yes">强制</span></td><td>美国首部水印专项法；大型 AI 平台须提供免费检测工具、嵌入显式和隐式水印</td></tr>
+      <tr><td>🇺🇸 其他州</td><td>科罗拉多、犹他、伊利诺伊 AI 透明度法</td><td>2026.1.1</td><td><span class="badge badge-partial">部分强制</span></td><td>要求 AI 使用透明度披露，但范围和力度弱于加州</td></tr>
+      <tr><td>🇺🇸 联邦</td><td>COPIED Act / TAKE IT DOWN Act</td><td>推进中</td><td><span class="badge badge-pending">推进中</span></td><td>TAKE IT DOWN：非自愿深伪亲密图像入刑；COPIED：拟要求 NIST 制定水印标准</td></tr>
+      <tr><td>🇯🇵 日本</td><td>《AI 促进法》</td><td>2025.6.4</td><td><span class="badge badge-partial">原则导向</span></td><td>不针对生成式 AI 单独立法；靠行业自律和现有法律框架管理</td></tr>
+      <tr><td>🇧🇷 巴西</td><td>AI 法案 (Bill No. 2338/2023)</td><td>立法中</td><td><span class="badge badge-pending">推进中</span></td><td>参议院 2024.12 通过，采用欧盟式风险分级，含透明度要求</td></tr>
+      <tr><td>🇬🇧 英国</td><td>无专项法</td><td>—</td><td><span class="badge badge-no">自律</span></td><td>促进创新路线，依赖现有法律和行业自律</td></tr>
+      <tr><td>🇨🇦 加拿大</td><td>AI 治理倡议（进行中）</td><td>—</td><td><span class="badge badge-pending">推进中</span></td><td>有框架讨论，尚无强制性标识立法</td></tr>
+      <tr><td>🇦🇺 澳大利亚</td><td>AI 治理倡议（进行中）</td><td>—</td><td><span class="badge badge-pending">推进中</span></td><td>有框架讨论，尚无强制性标识立法</td></tr>
+    </tbody></table>
+    <div class="summary-box">
+      <h3>立法格局总结</h3>
+      <p><strong>第一梯队（已生效/即将生效）：</strong>中国（2025.9）、欧盟（2026.8）、韩国（2026.1）、美国加州（2026.8）</p>
+      <p><strong>第二梯队（推进中）：</strong>美国联邦、巴西、加拿大、澳大利亚</p>
+      <p><strong>第三梯队（自律为主）：</strong>日本、英国</p>
     </div>
   </div>
+  <div class="section">
+    <div class="section-title">二、各大公司 C2PA 加入情况</div>
+    <p style="font-size:13px;color:var(--text-sec);margin-bottom:10px;">C2PA 由 Adobe 与微软于 2021 年联合发起，截至 2026 年初成员及关联方已超 6,000 家。</p>
+    <div class="sub-title">指导委员会成员（Steering Committee）</div>
+    <table><thead><tr><th>公司</th><th>C2PA 角色</th><th>实际部署</th></tr></thead>
+    <tbody>
+      <tr><td>Adobe</td><td><span class="badge badge-steering">联合创始/指导委员会</span></td><td>Firefly 全面嵌入 Content Credentials；主导 CAI</td></tr>
+      <tr><td>Microsoft</td><td><span class="badge badge-steering">联合创始/指导委员会</span></td><td>Bing Image Creator、Designer 等嵌入 C2PA 元数据</td></tr>
+      <tr><td>Google</td><td><span class="badge badge-steering">指导委员会</span></td><td>Gemini 带 C2PA 标识；SynthID 水印覆盖多模态</td></tr>
+      <tr><td>OpenAI</td><td><span class="badge badge-steering">指导委员会</span></td><td>DALL-E 3 自动嵌入 Content Credentials</td></tr>
+      <tr><td>Meta</td><td><span class="badge badge-steering">指导委员会</span></td><td>Facebook/Instagram/Threads 自动标注 AI 生成图片</td></tr>
+      <tr><td>Amazon</td><td><span class="badge badge-steering">指导委员会</span></td><td>AWS 隐式水印系统；广告平台要求 AI 内容标识</td></tr>
+      <tr><td>Sony</td><td><span class="badge badge-steering">指导委员会</span></td><td>相机固件级 C2PA 签名；PXW-Z300 专业摄像机支持</td></tr>
+      <tr><td>Intel</td><td><span class="badge badge-steering">指导委员会</span></td><td>硬件层面支持内容溯源技术</td></tr>
+      <tr><td>Truepic</td><td><span class="badge badge-steering">指导委员会</span></td><td>企业级 C2PA 签名和验证基础设施</td></tr>
+    </tbody></table>
+    <div class="sub-title">重要成员（Members / Affiliates）</div>
+    <table><thead><tr><th>公司/机构</th><th>C2PA 角色</th><th>实际部署</th></tr></thead>
+    <tbody>
+      <tr><td>BBC</td><td><span class="badge badge-member">成员</span></td><td>新闻内容嵌入 Content Credentials</td></tr>
+      <tr><td>Associated Press</td><td><span class="badge badge-member">成员</span></td><td>新闻图片嵌入 C2PA 元数据</td></tr>
+      <tr><td>TikTok</td><td><span class="badge badge-member">成员</span></td><td>平台端识别和标注 AI 生成内容</td></tr>
+      <tr><td>Canva</td><td><span class="badge badge-member">成员</span></td><td>设计工具中集成 Content Credentials</td></tr>
+      <tr><td>Arm</td><td><span class="badge badge-member">成员</span></td><td>芯片架构层面支持内容溯源</td></tr>
+      <tr><td>三星</td><td><span class="badge badge-member">成员</span></td><td>Galaxy S25 首款消费级手机原生 C2PA 相机签名</td></tr>
+      <tr><td>Midjourney</td><td><span class="badge badge-member">成员</span></td><td>生成图片嵌入 C2PA Content Credentials</td></tr>
+    </tbody></table>
+    <div class="sub-title">未加入 C2PA 的主要公司</div>
+    <table><thead><tr><th>公司</th><th>状态</th><th>备注</th></tr></thead>
+    <tbody>
+      <tr><td>Anthropic</td><td><span class="badge badge-no">未加入</span></td><td>产品以文本对话为主；欧盟 AI Act 8月起对文本也有标识要求</td></tr>
+      <tr><td>X (Twitter)</td><td><span class="badge badge-no">主动退出</span></td><td>马斯克接手后退出，平台不识别也不标注 AI 内容</td></tr>
+      <tr><td>Apple</td><td><span class="badge badge-no">未加入</span></td><td>Apple Intelligence 有 AI 功能但未公开加入 C2PA</td></tr>
+      <tr><td>字节跳动（国内）</td><td><span class="badge badge-partial">遵循国标</span></td><td>TikTok 国际版已加入；国内按中国国标执行</td></tr>
+      <tr><td>百度/阿里/腾讯</td><td><span class="badge badge-partial">遵循国标</span></td><td>未加入 C2PA 国际组织，按中国强制性国标执行</td></tr>
+    </tbody></table>
+  </div>
+  <div class="section">
+    <div class="section-title">三、关键时间线</div>
+    <table><thead><tr><th>时间</th><th>事件</th></tr></thead>
+    <tbody>
+      <tr><td>2021</td><td>Adobe + Microsoft 联合发起 C2PA</td></tr>
+      <tr><td>2024.12</td><td>巴西参议院通过 AI 法案</td></tr>
+      <tr><td>2025.5</td><td>美国联邦 TAKE IT DOWN Act 签署</td></tr>
+      <tr><td>2025.6</td><td>日本《AI 促进法》生效</td></tr>
+      <tr><td>2025.9</td><td>中国《AI 生成合成内容标识办法》+ 强制性国标生效</td></tr>
+      <tr><td>2025.10</td><td>C2PA 合规认证计划上线</td></tr>
+      <tr><td>2025.12</td><td>特朗普签署联邦 AI 政策框架行政令；C2PA 成员超 6,000 家</td></tr>
+      <tr><td>2026.1</td><td>韩国《AI 基本法》生效；美国多州 AI 透明度法生效；三星 Galaxy S25 原生 C2PA</td></tr>
+      <tr><td>2026.6</td><td>欧盟标注实践准则定稿</td></tr>
+      <tr><td>2026.8.2</td><td>⭐ 欧盟 AI Act 第50条 + 加州 SB-942 正式生效</td></tr>
+    </tbody></table>
+  </div>
+  <div class="footer">数据来源：C2PA 官网、Content Authenticity Initiative、各国政府公报、公开报道 · 由 Claude 整理于 2026.4.7</div>
 </div>
+</div><!-- /page-c2pa -->
 
-<!-- ===== Tab Switch Script ===== -->
+</div><!-- /app -->
+
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Stats
-    document.getElementById('day-count').textContent = document.querySelectorAll('.day-section').length;
-    document.getElementById('news-count').textContent = document.querySelectorAll('.news-item').length;
+(function(){
+'use strict';
 
-    // Tab switching
-    var tabs = document.querySelectorAll('.nav-tab');
-    tabs.forEach(function(tab) {
-      tab.addEventListener('click', function() {
-        tabs.forEach(function(t) { t.classList.remove('active'); });
-        tab.classList.add('active');
-        document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
-        document.getElementById('page-' + tab.dataset.page).classList.add('active');
-        window.scrollTo(0, 0);
+/* ── Tab switching ── */
+var tabs = document.querySelectorAll('.nav-tab');
+tabs.forEach(function(tab){
+  tab.addEventListener('click', function(){
+    tabs.forEach(function(t){ t.classList.remove('active'); });
+    tab.classList.add('active');
+    document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+    document.getElementById('page-'+tab.dataset.page).classList.add('active');
+    window.scrollTo(0,0);
+    buildTimeline(tab.dataset.page);
+  });
+});
+
+/* ── Stats ── */
+document.getElementById('day-count').textContent  = document.querySelectorAll('.day-block').length;
+document.getElementById('news-count').textContent = document.querySelectorAll('.ni').length;
+
+/* ── Day collapse ── */
+document.querySelectorAll('.day-header').forEach(function(hdr){
+  hdr.addEventListener('click', function(){
+    hdr.closest('.day-block').classList.toggle('collapsed');
+  });
+});
+
+/* ── Category filter ── */
+var activeFilter = 'all';
+document.querySelectorAll('.chip').forEach(function(chip){
+  chip.addEventListener('click', function(){
+    document.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('active'); });
+    chip.classList.add('active');
+    activeFilter = chip.dataset.cat;
+    applyFilter();
+  });
+});
+function applyFilter(){
+  document.querySelectorAll('.day-block').forEach(function(block){
+    var hasVisible = false;
+    block.querySelectorAll('.cat-group').forEach(function(grp){
+      var show = activeFilter==='all' || grp.dataset.cat===activeFilter;
+      grp.classList.toggle('hidden', !show);
+      if(show) hasVisible = true;
+    });
+    block.classList.toggle('hidden', !hasVisible);
+  });
+  buildTimeline('daily');
+}
+
+/* ══════════════════════════════════════
+   TIMELINE
+══════════════════════════════════════ */
+var track      = document.getElementById('tl-track');
+var thumb      = document.getElementById('tl-thumb');
+var scrubLabel = document.getElementById('tl-scrub-label');
+var tlEntries  = []; // [{el, dot}]
+var isDragging = false;
+var currentPage = 'daily';
+
+/* Month names */
+var MONTHS = ['','1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+function buildTimeline(page){
+  currentPage = page;
+  // Remove old dots/groups (keep thumb and scrub-label)
+  var old = track.querySelectorAll('.tl-month-group');
+  old.forEach(function(n){ n.remove(); });
+  tlEntries = [];
+
+  var items = [];
+  if(page === 'daily'){
+    document.querySelectorAll('.day-block:not(.hidden)').forEach(function(block){
+      var d = block.dataset.date; // "2026-04-08"
+      if(!d) return;
+      var parts = d.split('-');
+      var month = parseInt(parts[1],10);
+      var day   = parseInt(parts[2],10);
+      items.push({ el:block, month:month, label: month+'月'+day, shortLabel: day+'日', year:parts[0] });
+    });
+  } else if(page === 'weekly'){
+    document.querySelectorAll('.week-block').forEach(function(block){
+      var w = block.dataset.week;    // "2026-W15"
+      var lbl = block.dataset.label; // "4月第2周"
+      items.push({ el:block, month:4, label:lbl||w, shortLabel:lbl||w, year:'2026' });
+    });
+  } else {
+    // C2PA: no timeline
+    thumb.style.top = '0px';
+    return;
+  }
+
+  if(items.length === 0) return;
+
+  // Group by month
+  var months = {};
+  items.forEach(function(item){
+    var key = item.year+'-'+item.month;
+    if(!months[key]) months[key] = { label: MONTHS[item.month]||item.month+'月', entries:[] };
+    months[key].entries.push(item);
+  });
+
+  Object.keys(months).forEach(function(key){
+    var grp = months[key];
+    var groupEl = document.createElement('div');
+    groupEl.className = 'tl-month-group';
+
+    var monthLabel = document.createElement('div');
+    monthLabel.className = 'tl-month-label';
+    monthLabel.textContent = grp.label;
+    groupEl.appendChild(monthLabel);
+
+    grp.entries.forEach(function(item){
+      var dot = document.createElement('div');
+      dot.className = 'tl-dot';
+      dot.setAttribute('data-label', item.label);
+      dot.addEventListener('click', function(e){
+        e.stopPropagation();
+        scrollToEntry(item.el);
       });
+      groupEl.appendChild(dot);
+      tlEntries.push({ el: item.el, dot: dot, label: item.label });
     });
 
-    // URL hash support
-    if (window.location.hash === '#c2pa') {
-      document.querySelector('[data-page="c2pa"]').click();
-    }
+    track.appendChild(groupEl);
   });
+
+  updateThumb();
+  setupScrollObserver();
+}
+
+function scrollToEntry(el){
+  var offset = el.getBoundingClientRect().top + window.pageYOffset - 70;
+  window.scrollTo({ top: offset, behavior:'smooth' });
+}
+
+/* ── Scroll observer ── */
+var observer = null;
+function setupScrollObserver(){
+  if(observer) observer.disconnect();
+  if(tlEntries.length === 0) return;
+
+  observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        var found = tlEntries.find(function(t){ return t.el === entry.target; });
+        if(found) setActiveDot(found);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '-60px 0px -60% 0px' });
+
+  tlEntries.forEach(function(t){ observer.observe(t.el); });
+}
+
+function setActiveDot(entry){
+  tlEntries.forEach(function(t){ t.dot.classList.remove('active'); });
+  entry.dot.classList.add('active');
+  updateThumb();
+}
+
+/* ── Thumb position (mirrors scroll progress) ── */
+function updateThumb(){
+  if(isDragging) return;
+  var trackH = track.getBoundingClientRect().height;
+  var scrollTop = window.pageYOffset;
+  var docH = document.body.scrollHeight - window.innerHeight;
+  var pct = docH > 0 ? scrollTop / docH : 0;
+  thumb.style.top = (pct * (trackH - 10)) + 'px';
+}
+window.addEventListener('scroll', updateThumb, { passive:true });
+
+/* ── Drag-to-scrub ── */
+track.addEventListener('mousedown', startDrag);
+track.addEventListener('touchstart', startDrag, { passive:true });
+
+function startDrag(e){
+  isDragging = true;
+  track.classList.add('dragging');
+  moveDrag(e);
+  window.addEventListener('mousemove', moveDrag);
+  window.addEventListener('touchmove', moveDrag, { passive:true });
+  window.addEventListener('mouseup', endDrag);
+  window.addEventListener('touchend', endDrag);
+}
+
+function moveDrag(e){
+  if(!isDragging) return;
+  var rect = track.getBoundingClientRect();
+  var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  var pct = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+
+  thumb.style.top = (pct * (rect.height - 10)) + 'px';
+
+  // Find closest timeline entry by position ratio
+  var closest = getEntryAtPct(pct);
+  if(closest){
+    scrubLabel.textContent = closest.label;
+    scrubLabel.style.top   = thumb.style.top;
+    tlEntries.forEach(function(t){ t.dot.classList.remove('active'); });
+    closest.dot.classList.add('active');
+  }
+
+  // Scroll page
+  var docH = document.body.scrollHeight - window.innerHeight;
+  window.scrollTo(0, pct * docH);
+}
+
+function endDrag(){
+  isDragging = false;
+  track.classList.remove('dragging');
+  window.removeEventListener('mousemove', moveDrag);
+  window.removeEventListener('touchmove', moveDrag);
+  window.removeEventListener('mouseup', endDrag);
+  window.removeEventListener('touchend', endDrag);
+}
+
+function getEntryAtPct(pct){
+  if(tlEntries.length === 0) return null;
+  var idx = Math.round(pct * (tlEntries.length - 1));
+  idx = Math.max(0, Math.min(tlEntries.length-1, idx));
+  return tlEntries[idx];
+}
+
+/* ── Click on track (not dot) → jump ── */
+track.addEventListener('click', function(e){
+  if(e.target === track || e.target.classList.contains('tl-month-group') || e.target.classList.contains('tl-month-label')){
+    var rect = track.getBoundingClientRect();
+    var pct = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+    var docH = document.body.scrollHeight - window.innerHeight;
+    window.scrollTo({ top: pct * docH, behavior:'smooth' });
+  }
+});
+
+/* ── Init ── */
+buildTimeline('daily');
+
+/* URL hash */
+var hashMap = { '#c2pa':'c2pa', '#weekly':'weekly', '#daily':'daily' };
+var hashTarget = hashMap[window.location.hash];
+if(hashTarget){
+  document.querySelector('[data-page="'+hashTarget+'"]').click();
+}
+
+})();
 </script>
 </body>
 </html>
