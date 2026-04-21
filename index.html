@@ -15,7 +15,23 @@
   --c-hardware:#d9730d; --c-startup:#0f7b6c; --c-policy:#cb912f;
   --nav-h:52px;
   --tl-w:60px;
+  --toggle-bg:#e8e7e3; --toggle-dot:#fff;
 }
+html.dark {
+  --bg:#191919; --surface:#202020; --surface2:#262626;
+  --border:#2f2f2f; --border2:#3a3a3a;
+  --text:#e3e2de; --text-sec:#9b9a97; --text-muted:#6b6b6b;
+  --accent:#9b8afb; --accent2:#e87da0;
+  --c-model:#9b8afb; --c-research:#e87da0;
+  --c-hardware:#e8910d; --c-startup:#2db99a; --c-policy:#e0a73b;
+  --toggle-bg:#4a4a4a; --toggle-dot:#e3e2de;
+}
+html.dark .badge-yes{background:#2db99a;}
+html.dark .badge-no{background:#e16259;}
+html.dark .badge-partial{background:#e0a73b;}
+html.dark .badge-pending{background:#9b8afb;}
+html.dark .badge-steering{background:#9b8afb;}
+html.dark .badge-member{background:#529cca;}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
@@ -363,10 +379,33 @@ tbody td:first-child{color:var(--text);font-weight:500;white-space:nowrap;}
 .summary-box p{font-size:12px;color:var(--text-sec);line-height:1.65;margin-bottom:3px;}
 .footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--border);font-size:11px;color:var(--text-muted);text-align:center;}
 
+/* ══ Theme Toggle ══ */
+.theme-toggle{
+  margin-left:auto;display:flex;align-items:center;gap:6px;
+  cursor:pointer;user-select:none;flex-shrink:0;
+}
+.theme-toggle-label{font-size:12px;color:var(--text-muted);}
+.theme-toggle-track{
+  width:36px;height:20px;border-radius:10px;
+  background:var(--toggle-bg);
+  position:relative;transition:background .25s;
+}
+.theme-toggle-thumb{
+  width:16px;height:16px;border-radius:50%;
+  background:var(--toggle-dot);
+  position:absolute;top:2px;left:2px;
+  transition:transform .25s;
+  box-shadow:0 1px 3px rgba(0,0,0,0.15);
+}
+html.dark .theme-toggle-track{background:var(--accent);}
+html.dark .theme-toggle-thumb{transform:translateX(16px);}
+.theme-toggle-icon{font-size:14px;line-height:1;}
+
 @media(max-width:600px){
   .news-grid,.wk-highlights,.wk-cats,.wk-stats{grid-template-columns:1fr;}
   .wk-hl.featured{grid-column:span 1;}
   .page-header,.wk-header{flex-direction:column;align-items:flex-start;gap:8px;}
+  .theme-toggle-label{display:none;}
 }
 </style>
 </head>
@@ -379,6 +418,10 @@ tbody td:first-child{color:var(--text);font-weight:500;white-space:nowrap;}
       <div class="nav-tab active" data-page="daily">AI 日报</div>
       <div class="nav-tab" data-page="weekly">周报</div>
       <div class="nav-tab" data-page="c2pa">立法 & C2PA</div>
+    </div>
+    <div class="theme-toggle" id="theme-toggle" title="切换深色/浅色模式">
+      <span class="theme-toggle-icon" id="theme-icon">☀️</span>
+      <div class="theme-toggle-track"><div class="theme-toggle-thumb"></div></div>
     </div>
   </div>
 </nav>
@@ -1594,6 +1637,39 @@ var hashTarget = hashMap[window.location.hash];
 if(hashTarget){
   document.querySelector('[data-page="'+hashTarget+'"]').click();
 }
+
+/* ── Theme toggle ── */
+(function(){
+  var html = document.documentElement;
+  var toggle = document.getElementById('theme-toggle');
+  var icon = document.getElementById('theme-icon');
+
+  function applyTheme(dark){
+    if(dark){
+      html.classList.add('dark');
+      icon.textContent = '🌙';
+    } else {
+      html.classList.remove('dark');
+      icon.textContent = '☀️';
+    }
+    try { localStorage.setItem('ai-hub-theme', dark ? 'dark' : 'light'); } catch(e){}
+  }
+
+  // Init: check saved preference or system preference
+  var saved = null;
+  try { saved = localStorage.getItem('ai-hub-theme'); } catch(e){}
+  if(saved === 'dark'){
+    applyTheme(true);
+  } else if(saved === 'light'){
+    applyTheme(false);
+  } else if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
+    applyTheme(true);
+  }
+
+  toggle.addEventListener('click', function(){
+    applyTheme(!html.classList.contains('dark'));
+  });
+})();
 
 })();
 </script>
