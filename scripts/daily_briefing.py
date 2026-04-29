@@ -1,268 +1,343 @@
 #!/usr/bin/env python3
 """
-Daily AI Briefing — GitHub Actions runner
-搜索过去 24 小时 AI 大事件 → 推送飞书卡片 → 更新 index.html 归档
+Daily AI Briefing — GitHub Actions runner (no LLM API required)
+duckduckgo-search → 分类过滤 → 飞书卡片 + index.html 归档
 """
 
-import os, sys, json, re, datetime, requests, time
-import anthropic
+import os, sys, json, re, datetime, time, textwrap
+import requests
+
+try:
+    from duckduckgo_search import DDGS
+except ImportError:
+    os.system("pip install duckduckgo-search -q")
+    from duckduckgo_search import DDGS
 
 # ── 配置 ──────────────────────────────────────────────────────────────────
 FEISHU_WEBHOOK = os.environ["FEISHU_WEBHOOK"]
-ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
-ARCHIVE_HTML = "index.html"
+ARCHIVE_HTML   = "index.html"
 ARCHIVE_MARKER = "<!-- ARCHIVE_INSERT_POINT -->"
-WEEKLY_MARKER = "<!-- WEEKLY_INSERT_POINT -->"
-ARCHIVE_URL = "https://limkown-stack.github.io/ai-insight-hub/"
+ARCHIVE_URL    = "https://limkown-stack.github.io/ai-insight-hub/"
 
-client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+today     = datetime.date.today()
+today_str = today.strftime("%Y年%-m月%-d日")
+today_iso = today.isoformat()
 
-today = datetime.date.today()
-today_str = today.strftime("%Y年%-m月%-d日")   # e.g. 2026年4月29日
-today_iso = today.isoformat()                  # e.g. 2026-04-29
-is_monday = today.weekday() == 0
-
-# ── 工具定义（web_search via Brave via Anthropic tool_use）────────────────
-tools = [
-    {
-        "name": "web_search",
-        "description": "Search the web for recent news. Returns a list of {title, url, snippet} objects.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "query": {"type": "string", "description": "Search query string"}
-            },
-            "required": ["query"]
-        }
+# 分类关键词映射
+CATEGORIES = {
+    "model": {
+        "label": "大模型与产品",
+        "color_var": "var(--c-model)",
+        "keywords": [
+            "GPT", "Claude", "Gemini", "DeepSeek", "Llama", "Qwen", "通义",
+            "大模型", "LLM", "model", "ChatGPT", "Grok", "豆包", "文心",
+            "mistral", "phi", "release", "launch", "发布", "上线", "更新",
+            "MiniMax", "智谱", "Moonshot", "kimi", "百川", "spark", "讯飞"
+        ]
+    },
+    "research": {
+        "label": "技术前沿",
+        "color_var": "var(--c-research)",
+        "keywords": [
+            "research", "paper", "arxiv", "benchmark", "reasoning", "agent",
+            "multimodal", "robotics", "机器人", "具身", "强化学习", "RL",
+            "论文", "技术", "算法", "架构", "世界模型", "agentic", "RAG",
+            "embodied", "VLA", "diffusion", "transformer", "attention"
+        ]
+    },
+    "hardware": {
+        "label": "AI 硬件",
+        "color_var": "var(--c-hardware)",
+        "keywords": [
+            "NVIDIA", "英伟达", "GPU", "chip", "芯片", "Blackwell", "Rubin",
+            "华为昇腾", "Ascend", "TPU", "NPU", "AMD", "Intel", "算力",
+            "datacenter", "数据中心", "semiconductor", "半导体", "H100",
+            "H200", "B200", "寒武纪", "海光", "昆仑芯", "hardware"
+        ]
+    },
+    "startup": {
+        "label": "AI 创业与融资",
+        "color_var": "var(--c-startup)",
+        "keywords": [
+            "funding", "raises", "投资", "融资", "startup", "valuation",
+            "Series", "seed", "venture", "VC", "亿美元", "billion", "million",
+            "估值", "轮", "Sequoia", "红杉", "a16z", "投融资", "IPO",
+            "acquisition", "收购", "merger", "创业"
+        ]
+    },
+    "policy": {
+        "label": "政策与安全",
+        "color_var": "var(--c-policy)",
+        "keywords": [
+            "regulation", "policy", "法规", "监管", "safety", "安全",
+            "EU", "欧盟", "FTC", "Congress", "White House", "白宫",
+            "发改委", "工信部", "网信办", "治理", "governance", "ban",
+            "禁止", "合规", "copyright", "版权", "bias", "risk", "风险"
+        ]
     }
+}
+
+# 搜索查询
+SEARCH_QUERIES = [
+    f"AI artificial intelligence news {today.strftime('%B %d %Y')}",
+    f"OpenAI Anthropic Google AI announcement {today.strftime('%B %d %Y')}",
+    f"AI model release funding {today.strftime('%B %d %Y')}",
+    f"人工智能 大模型 新闻 {today_iso}",
+    f"AI 融资 发布 {today_iso}",
+    f"AI chip hardware semiconductor {today.strftime('%B %d %Y')}",
 ]
 
-# ── 系统提示 ───────────────────────────────────────────────────────────────
-SYSTEM = f"""你是一名专业 AI 行业编辑，负责每日生成 AI 简报。今天是 {today_iso}。
+def ddg_search(query: str, max_results: int = 8) -> list:
+    """DuckDuckGo 搜索，返回 [{title, href, body}]"""
+    try:
+        with DDGS() as ddgs:
+            results = list(ddgs.text(
+                query,
+                region="wt-wt",
+                safesearch="off",
+                timelimit="d",   # past day
+                max_results=max_results
+            ))
+        return results
+    except Exception as e:
+        print(f"  [ddg] search error for '{query}': {e}")
+        time.sleep(2)
+        return []
 
-任务：
-1. 使用 web_search 工具搜索今天（{today_iso}）AI 行业新闻，中英文各至少 4-6 条候选。
-2. 每条候选须通过 6 项自检：源文章在搜索结果里、URL 直接复制自搜索结果、所有数字可核实、
-   机构归属与源文章一致、源文章发布日期在过去 24 小时内、是"今天发生的新事件"而非旧事件。
-3. 筛选 8-12 条，5 个分类均衡：大模型与产品、技术前沿、AI 硬件、AI 创业与融资、政策与安全。
-4. 输出两个 JSON 对象（用 ===FEISHU=== 和 ===HTML=== 分隔）：
-   - FEISHU: 飞书卡片 payload（见规范）
-   - HTML: 单个 day-block HTML 片段（见规范）
+def score_category(text: str) -> str:
+    """根据关键词打分，返回最匹配的分类"""
+    text_lower = text.lower()
+    scores = {}
+    for cat, info in CATEGORIES.items():
+        score = sum(1 for kw in info["keywords"] if kw.lower() in text_lower)
+        scores[cat] = score
+    best = max(scores, key=scores.get)
+    return best if scores[best] > 0 else "model"
 
-飞书卡片规范（严格遵守）：
-- msg_type: interactive
-- card.config: {{"wide_screen_mode": true}}
-- 无 header（无紫色 banner）
-- 首行：**今日 AI 简报 · {today_str}**
-- 每个分类 tag 为 lark_md，格式：
-  **【分类名】**\\n**[标题](URL)**\\n> 摘要（1-3句）\\n**[下一条标题](URL)**\\n> 摘要
-- 分类间加 hr
-- 末尾 action 按钮：📖 查看完整归档，url={ARCHIVE_URL}，type=primary
+def is_ai_relevant(item: dict) -> bool:
+    """过滤非 AI 新闻"""
+    text = (item.get("title","") + " " + item.get("body","")).lower()
+    ai_keywords = ["ai", "artificial intelligence", "人工智能", "大模型", "llm",
+                   "machine learning", "deep learning", "neural", "openai",
+                   "anthropic", "google deepmind", "deepseek", "nvidia gpu"]
+    return any(kw in text for kw in ai_keywords)
 
-HTML day-block 规范：
-- id="day-{today_iso}" data-date="{today_iso}"
-- day-count 与实际条数一致
-- 每条新闻：
-  <div class="ni" data-cat="[model|research|hardware|startup|policy]">
-    <div class="ni-title"><a href="URL" target="_blank">标题</a></div>
-    <div class="ni-summary">摘要（2-4句）</div>
-  </div>
-- cat 对应：大模型=model, 技术前沿=research, 硬件=hardware, 创业融资=startup, 政策安全=policy
+def truncate(text: str, max_chars: int = 120) -> str:
+    """截断摘要"""
+    text = text.strip()
+    if len(text) <= max_chars:
+        return text
+    return text[:max_chars].rsplit(" ", 1)[0] + "…"
 
-禁止编造 URL、数字或机构归属。不足 6 条时推送「今日动态较少」短版，不凑数。
-"""
+def collect_news() -> list:
+    """搜索 + 去重 + 分类，返回最终新闻列表"""
+    seen_urls = set()
+    seen_titles = set()
+    candidates = []
 
-def search(query: str) -> list:
-    """调用 Anthropic web_search（通过 tool_use 循环实现）"""
-    msgs = [{"role": "user", "content": f"搜索：{query}"}]
-    resp = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=2000,
-        tools=tools,
-        system="你是搜索助手，只负责调用 web_search 工具，不做其他事。",
-        messages=msgs
-    )
-    results = []
-    for block in resp.content:
-        if block.type == "tool_use" and block.name == "web_search":
-            # 模拟返回（实际 GitHub Actions 中 Anthropic 模型会处理 web_search）
-            results.append({"query": block.input.get("query", query)})
-    return results
+    for query in SEARCH_QUERIES:
+        print(f"  [search] {query}")
+        results = ddg_search(query)
+        time.sleep(1.5)  # 避免限速
 
-def run_briefing():
-    """主流程：让模型完成搜索 + 生成双格式输出"""
-    print(f"[briefing] date={today_iso}, is_monday={is_monday}")
+        for r in results:
+            url   = r.get("href", "")
+            title = r.get("title", "").strip()
+            body  = r.get("body", "").strip()
 
-    # 构建请求，让模型自主搜索并生成输出
-    search_queries = [
-        f"AI 大模型 新闻 {today_iso}",
-        f"人工智能 创业 融资 政策 {today_iso}",
-        f"AI news {today.strftime('%B %d %Y')} model release",
-        f"AI funding technology announcement {today.strftime('%B %d %Y')}",
+            # 去重
+            title_key = re.sub(r'\W+', '', title.lower())[:40]
+            if not url or not title or url in seen_urls or title_key in seen_titles:
+                continue
+            # AI 相关性过滤
+            if not is_ai_relevant(r):
+                continue
+            # 过滤明显非新闻页
+            skip_domains = ["reddit.com", "youtube.com", "twitter.com",
+                            "x.com", "wikipedia.org", "amazon.com"]
+            if any(d in url for d in skip_domains):
+                continue
+
+            seen_urls.add(url)
+            seen_titles.add(title_key)
+            cat = score_category(title + " " + body)
+            candidates.append({
+                "title":   title,
+                "url":     url,
+                "summary": truncate(body, 130),
+                "cat":     cat
+            })
+
+    # 每类取最多 3 条，总数控制在 8-12
+    by_cat = {c: [] for c in CATEGORIES}
+    for item in candidates:
+        by_cat[item["cat"]].append(item)
+
+    final = []
+    # 每类至少 1 条，大模型/创业最多 3 条，其他最多 2 条
+    limits = {"model": 3, "research": 2, "hardware": 2, "startup": 3, "policy": 2}
+    for cat in CATEGORIES:
+        items = by_cat[cat][:limits[cat]]
+        final.extend(items)
+        if len(final) >= 12:
+            break
+
+    # 保证至少 6 条（不够则从候选里补）
+    if len(final) < 6:
+        extras = [i for i in candidates if i not in final]
+        final.extend(extras[:max(0, 6 - len(final))])
+
+    print(f"  [collect] {len(final)} items selected")
+    return final[:12]
+
+# ── 飞书 payload 生成 ─────────────────────────────────────────────────────
+def make_feishu_payload(news: list) -> dict:
+    elements = [
+        {"tag": "div", "text": {"tag": "lark_md",
+         "content": f"**今日 AI 简报 · {today_str}**"}},
+        {"tag": "hr"}
     ]
 
-    prompt = f"""今天是 {today_iso}（{today_str}）。
+    # 按分类分组
+    by_cat = {c: [] for c in CATEGORIES}
+    for item in news:
+        by_cat[item["cat"]].append(item)
 
-请执行以下步骤：
-1. 用 web_search 工具搜索以下查询（每个都要搜）：
-{chr(10).join(f'   - {q}' for q in search_queries)}
-
-2. 基于搜索结果，严格过滤出过去 24 小时内的真实 AI 新闻，8-12 条，5 类均衡。
-
-3. 按以下格式输出（两个 JSON，之间用分隔线）：
-
-===FEISHU===
-{{飞书 payload JSON}}
-===HTML===
-{{day-block HTML 字符串}}
-===END===
-"""
-
-    messages = [{"role": "user", "content": prompt}]
-    
-    # agentic loop
-    max_iters = 10
-    for i in range(max_iters):
-        resp = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=8000,
-            tools=tools,
-            system=SYSTEM,
-            messages=messages
-        )
-        
-        # 收集工具调用结果
-        tool_results = []
-        has_tool_use = False
-        
-        for block in resp.content:
-            if block.type == "tool_use":
-                has_tool_use = True
-                print(f"  [search] {block.input.get('query','?')}")
-                # 执行真实搜索（此处通过 Anthropic 内置 web_search）
-                tool_results.append({
-                    "type": "tool_result",
-                    "tool_use_id": block.id,
-                    "content": "Search executed."
-                })
-        
-        if has_tool_use:
-            messages.append({"role": "assistant", "content": resp.content})
-            messages.append({"role": "user", "content": tool_results})
+    first_cat = True
+    for cat, info in CATEGORIES.items():
+        items = by_cat[cat]
+        if not items:
             continue
-        
-        # 没有工具调用，提取文本输出
-        text = "".join(b.text for b in resp.content if hasattr(b, "text"))
-        return text
-    
-    return None
+        if not first_cat:
+            elements.append({"tag": "hr"})
+        first_cat = False
 
-def extract_parts(text: str):
-    """从模型输出中提取 FEISHU payload 和 HTML block"""
-    feishu_match = re.search(r'===FEISHU===\s*(.*?)\s*===HTML===', text, re.DOTALL)
-    html_match = re.search(r'===HTML===\s*(.*?)\s*===END===', text, re.DOTALL)
-    
-    feishu_json = None
-    html_block = None
-    
-    if feishu_match:
-        try:
-            feishu_json = json.loads(feishu_match.group(1).strip())
-        except json.JSONDecodeError as e:
-            print(f"[warn] Feishu JSON parse error: {e}")
-    
-    if html_match:
-        html_block = html_match.group(1).strip()
-    
-    return feishu_json, html_block
+        lines = [f"**【{info['label']}】**"]
+        for item in items:
+            lines.append(f"**[{item['title']}]({item['url']})**")
+            lines.append(f"> {item['summary']}")
+        elements.append({"tag": "div", "text": {"tag": "lark_md",
+                          "content": "\n".join(lines)}})
 
+    elements += [
+        {"tag": "hr"},
+        {"tag": "action", "actions": [{
+            "tag": "button",
+            "text": {"tag": "lark_md", "content": "📖 查看完整归档"},
+            "url": ARCHIVE_URL,
+            "type": "primary"
+        }]}
+    ]
+    return {"msg_type": "interactive", "card": {
+        "config": {"wide_screen_mode": True},
+        "elements": elements
+    }}
+
+def make_feishu_short() -> dict:
+    """今日动态较少时的短版"""
+    return {"msg_type": "interactive", "card": {
+        "config": {"wide_screen_mode": True},
+        "elements": [
+            {"tag": "div", "text": {"tag": "lark_md",
+             "content": f"**今日 AI 简报 · {today_str}**"}},
+            {"tag": "hr"},
+            {"tag": "div", "text": {"tag": "lark_md",
+             "content": "今日 AI 行业动态较少，未找到足够的最新资讯。\n> 可访问完整归档查看历史简报。"}},
+            {"tag": "hr"},
+            {"tag": "action", "actions": [{
+                "tag": "button",
+                "text": {"tag": "lark_md", "content": "📖 查看完整归档"},
+                "url": ARCHIVE_URL, "type": "primary"
+            }]}
+        ]
+    }}
+
+# ── HTML day-block 生成 ───────────────────────────────────────────────────
+def make_html_block(news: list) -> str:
+    by_cat = {c: [] for c in CATEGORIES}
+    for item in news:
+        by_cat[item["cat"]].append(item)
+
+    cat_groups = []
+    for cat, info in CATEGORIES.items():
+        items = by_cat[cat]
+        if not items:
+            continue
+        ni_html = ""
+        for item in items:
+            ni_html += (
+                f'          <div class="ni" data-cat="{cat}">'
+                f'<div class="ni-title"><a href="{item["url"]}" target="_blank">'
+                f'{item["title"]}</a></div>'
+                f'<div class="ni-summary">{item["summary"]}</div></div>\n'
+            )
+        cat_groups.append(
+            f'      <div class="cat-group" data-cat="{cat}">\n'
+            f'        <div class="cat-header"><div class="cat-dot" '
+            f'style="background:{info["color_var"]}"></div>'
+            f'{info["label"]}<span class="cat-count">{len(items)}条</span></div>\n'
+            f'        <div class="news-grid">\n{ni_html}'
+            f'        </div>\n'
+            f'      </div>\n'
+        )
+
+    body = "".join(cat_groups)
+    return (
+        f'  <div class="day-block" id="day-{today_iso}" data-date="{today_iso}">\n'
+        f'    <div class="day-divider"></div>\n'
+        f'    <div class="day-header">\n'
+        f'      <div class="day-title">{today_str}</div>\n'
+        f'      <div class="day-count">{len(news)}条</div>\n'
+        f'      <div class="day-toggle">▾</div>\n'
+        f'    </div>\n'
+        f'    <div class="day-body">\n'
+        f'{body}'
+        f'    </div>\n'
+        f'  </div><!-- /day-block {today_iso} -->\n'
+    )
+
+# ── 推送 & 归档 ──────────────────────────────────────────────────────────
 def push_feishu(payload: dict) -> bool:
-    """推送飞书卡片，失败重试 2 次"""
     for attempt in range(3):
         try:
-            r = requests.post(
-                FEISHU_WEBHOOK,
-                json=payload,
-                headers={"Content-Type": "application/json; charset=utf-8"},
-                timeout=15
-            )
+            r = requests.post(FEISHU_WEBHOOK, json=payload,
+                              headers={"Content-Type": "application/json; charset=utf-8"},
+                              timeout=15)
             data = r.json()
             if data.get("code") == 0:
-                print(f"[feishu] push success (attempt {attempt+1})")
+                print(f"[feishu] OK (attempt {attempt+1})")
                 return True
-            print(f"[feishu] error response: {data}")
+            print(f"[feishu] error: {data}")
         except Exception as e:
-            print(f"[feishu] attempt {attempt+1} failed: {e}")
+            print(f"[feishu] attempt {attempt+1}: {e}")
         time.sleep(3)
     return False
 
 def update_archive(html_block: str):
-    """在 index.html 的 ARCHIVE_INSERT_POINT 后插入新 day-block"""
     with open(ARCHIVE_HTML, "r", encoding="utf-8") as f:
         content = f.read()
-    
     if f'id="day-{today_iso}"' in content:
-        print(f"[archive] day-{today_iso} already exists, skipping")
+        print(f"[archive] day-{today_iso} already present, skip")
         return
-    
     if ARCHIVE_MARKER not in content:
-        print("[archive] ERROR: ARCHIVE_INSERT_POINT not found")
+        print("[archive] ERROR: ARCHIVE_INSERT_POINT missing")
         return
-    
-    new_content = content.replace(
-        ARCHIVE_MARKER,
-        ARCHIVE_MARKER + "\n" + html_block
-    )
+    new_content = content.replace(ARCHIVE_MARKER,
+                                  ARCHIVE_MARKER + "\n" + html_block)
     with open(ARCHIVE_HTML, "w", encoding="utf-8") as f:
         f.write(new_content)
     print(f"[archive] inserted day-{today_iso}")
 
-def fallback_feishu_payload():
-    """搜索或解析失败时推送短版通知"""
-    return {
-        "msg_type": "interactive",
-        "card": {
-            "config": {"wide_screen_mode": True},
-            "elements": [
-                {"tag": "div", "text": {"tag": "lark_md",
-                 "content": f"**今日 AI 简报 · {today_str}**"}},
-                {"tag": "hr"},
-                {"tag": "div", "text": {"tag": "lark_md",
-                 "content": "⚠️ 今日自动简报生成失败，请检查 GitHub Actions 日志。\n> 可在仓库 Actions 页面手动重跑，或查看 [完整归档](" + ARCHIVE_URL + ")"}},
-                {"tag": "hr"},
-                {"tag": "action", "actions": [
-                    {"tag": "button",
-                     "text": {"tag": "lark_md", "content": "📖 查看完整归档"},
-                     "url": ARCHIVE_URL, "type": "primary"}
-                ]}
-            ]
-        }
-    }
-
-# ── 主入口 ─────────────────────────────────────────────────────────────────
+# ── 主入口 ────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    output = run_briefing()
-    
-    if not output:
-        print("[main] No output from model, sending fallback")
-        push_feishu(fallback_feishu_payload())
-        sys.exit(1)
-    
-    feishu_payload, html_block = extract_parts(output)
-    
-    # 推送飞书
-    if feishu_payload:
-        success = push_feishu(feishu_payload)
-        if not success:
-            print("[main] Feishu push failed after 3 attempts")
-    else:
-        print("[main] No valid Feishu payload, sending fallback")
-        push_feishu(fallback_feishu_payload())
-    
-    # 更新归档
-    if html_block:
-        update_archive(html_block)
-    else:
-        print("[main] No HTML block to archive")
-    
-    print("[main] Done")
+    print(f"[main] date={today_iso}")
+    news = collect_news()
+
+    if len(news) < 6:
+        print(f"[main] only {len(news)} items, sending short card")
+        push_feishu(make_feishu_short())
+        sys.exit(0)
+
+    push_feishu(make_feishu_payload(news))
+    update_archive(make_html_block(news))
+    print("[main] done")
