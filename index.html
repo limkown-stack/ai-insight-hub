@@ -406,6 +406,76 @@ html.dark .theme-toggle-thumb{transform:translateX(16px);}
   .wk-hl.featured{grid-column:span 1;}
   .page-header,.wk-header{flex-direction:column;align-items:flex-start;gap:8px;}
   .theme-toggle-label{display:none;}
+  .invest-table-wrap{margin-left:-16px;margin-right:-16px;padding:0 16px;}
+}
+
+/* ══ Page 4: 投资参考 ══ */
+.invest-header{padding:32px 0 20px;border-bottom:1px solid var(--border);}
+.invest-header h1{font-size:22px;font-weight:700;color:var(--text);
+  font-family:"Noto Serif SC",Georgia,serif;}
+.invest-header p{color:var(--text-sec);font-size:12px;margin-top:5px;}
+.invest-header .invest-date{
+  display:inline-block;margin-top:8px;font-size:11px;color:var(--text-muted);
+  background:var(--surface);padding:3px 10px;border-radius:12px;
+}
+
+.invest-section{margin-top:32px;}
+.invest-section-title{
+  font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;color:var(--text);
+}
+.invest-section-title::before{content:"";display:inline-block;width:3px;height:17px;
+  background:var(--text);border-radius:2px;}
+
+.invest-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.invest-table{
+  width:100%;border-collapse:collapse;margin:0 0 20px;font-size:13px;
+  min-width:560px;
+}
+.invest-table thead th{
+  background:var(--surface);color:var(--text);font-weight:600;
+  padding:10px 12px;text-align:left;border-bottom:1px solid var(--border2);white-space:nowrap;
+  position:sticky;top:0;
+}
+.invest-table tbody td{
+  padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text-sec);vertical-align:top;
+}
+.invest-table tbody tr:hover{background:var(--surface);}
+.invest-table tbody td:first-child{color:var(--text);font-weight:500;white-space:nowrap;}
+.invest-table .ticker{
+  font-family:SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:600;
+  color:var(--accent);letter-spacing:.02em;
+}
+.invest-table .price{white-space:nowrap;font-weight:600;color:var(--text);}
+.invest-table .mcap{white-space:nowrap;color:var(--text-sec);}
+.invest-table .note{font-size:12px;color:var(--text-muted);max-width:220px;}
+.invest-table .valuation{font-weight:600;color:var(--text);white-space:nowrap;}
+.invest-table .round-info{font-size:12px;color:var(--text-sec);}
+
+.invest-badge{
+  display:inline-block;font-size:10px;font-weight:700;letter-spacing:.04em;
+  padding:2px 8px;border-radius:20px;color:#fff;white-space:nowrap;
+}
+.invest-badge-ipo{background:var(--accent);}
+.invest-badge-earnings{background:var(--c-hardware);}
+.invest-badge-policy{background:var(--c-policy);}
+.invest-badge-funding{background:var(--c-startup);}
+
+.invest-calendar{display:flex;flex-direction:column;gap:8px;}
+.invest-cal-item{
+  background:var(--bg);border:1px solid var(--border);border-radius:8px;
+  padding:12px 16px;display:flex;align-items:center;gap:12px;
+  transition:all .15s;
+}
+.invest-cal-item:hover{background:var(--surface);box-shadow:0 1px 6px rgba(55,53,47,0.06);}
+.invest-cal-date{
+  font-size:12px;font-weight:600;color:var(--text-muted);white-space:nowrap;min-width:90px;
+}
+.invest-cal-body{font-size:13px;color:var(--text);flex:1;}
+.invest-cal-body small{display:block;font-size:11px;color:var(--text-muted);margin-top:2px;}
+
+.invest-disclaimer{
+  margin-top:40px;padding-top:16px;border-top:1px solid var(--border);
+  font-size:11px;color:var(--text-muted);text-align:center;line-height:1.6;
 }
 </style>
 </head>
@@ -418,6 +488,7 @@ html.dark .theme-toggle-thumb{transform:translateX(16px);}
       <div class="nav-tab active" data-page="daily">AI 日报</div>
       <div class="nav-tab" data-page="weekly">周报</div>
       <div class="nav-tab" data-page="c2pa">立法 & C2PA</div>
+      <div class="nav-tab" data-page="invest">投资参考</div>
     </div>
     <div class="theme-toggle" id="theme-toggle" title="切换深色/浅色模式">
       <span class="theme-toggle-icon" id="theme-icon">☀️</span>
@@ -4965,6 +5036,7 @@ html.dark .theme-toggle-thumb{transform:translateX(16px);}
         <div class="wk-hl-title">特朗普 AI 安全行政令 5/21 临门取消、5/23 反向放行 + 欧盟高风险分类指南 / Omnibus 延期 + 五角大楼测评替换 Claude + 微软开源 Agent 安全工具 + GAITC 国家级 IP 中心</div>
         <div class="wk-hl-desc">美方监管在本周完成戏剧性反转：5/21 Axios 披露白宫原定的 AI 安全行政令签字仪式被马斯克、扎克伯格与 David Sacks 联手致电劝阻，特朗普称「不想阻碍美国领先」；5/22 Ars Technica 后续报道，行政令因 AI 公司 CEO 仅获 24 小时通知集体缺席而被取消，政府希望 90 天测试窗口、业界仅接受 14 天；5/23《卫报》报道特朗普签署新 AI 行政令——撤回对新 AI 模型的强制安全审查要求，被视为对科技行业的放行信号。同周 5/21 Bloomberg 披露五角大楼组织 25 名重度用户测试 OpenAI、Google、xAI Grok 等模型，准备替代被国防部长 Hegseth 列为供应链风险的 Anthropic Claude。欧盟侧：5/18 理事会致函议会推进 AI Act omnibus 一读通过——附录 III 高风险义务由 2026/8/2 顺延 16 个月至 2027/12/2，新增禁止 AI 生成非自愿亲密影像与 CSAM、生成内容透明 / 水印宽限期压缩到 3 个月；5/19 欧委会发布高风险 AI 系统分类指南草案，公开征求意见至 6/23。安全工具：5/20 微软安全团队开源 RAMPART（Pytest 对抗式 Red-Team 框架）与 Clarity（智能体规范持续校验），把 Agent 安全测试嵌入 CI 流水线；5/19 OpenAI 加入 C2PA 指导委员会、集成 SynthID 水印，发布 Verify 公开核验工具。中国 / 全球：5/23 国家发改委李超确认正开展 AI 立法研究，已出台制造 / 医疗 / 能源等十多个行业「AI+」政策文件；5/23-24 杭州 GAITC 2026 闭幕，国家级 AI 产业知识产权运营中心揭牌，《AI 关键能力清单 1.0》发布；5/22 IMF 报告警告全球约 40% 工作岗位将受 AI 扩张冲击；5/16-17 arXiv CS 板块出新规——对幻觉引用 / 未删 chatbot 片段实施 1 年禁投；5/18 Mistral CEO Mensch 警告法国国民议会不可让 Anthropic Mythos 扫描军方代码；5/23 Anthropic Project Glasswing 披露 Claude Mythos 在 1000+ 开源项目识别逾 1 万个高危漏洞，已修复 97 个 / 88 份公告；5/24 NTSB 因 AI 用 Codex 重建遇难飞行员语音事件紧急关闭整个民用运输事故公共数据库。</div>
         <div class="wk-hl-source"><a href="https://www.axios.com/2026/05/21/trump-ai-executive-order-postponed-why" target="_blank">→ 特朗普 AI 行政令临门取消</a> &nbsp;·&nbsp; <a href="https://digital-strategy.ec.europa.eu/en/library/draft-commission-guidelines-classification-high-risk-ai-systems" target="_blank">→ EU 高风险 AI 分类指南草案</a> &nbsp;·&nbsp; <a href="https://www.microsoft.com/en-us/security/blog/2026/05/20/introducing-rampart-and-clarity-open-source-tools-to-bring-safety-into-agent-development-workflow/" target="_blank">→ 微软开源 RAMPART + Clarity</a></div>
+      </div>
     </div>
   </div>
 
@@ -5078,6 +5150,7 @@ html.dark .theme-toggle-thumb{transform:translateX(16px);}
         <div class="wk-hl-title">习特北京峰会 AI 安全入议程 + 白宫起草 FDA 式 AI 行政令 + AI 终端国标符合性检测 + 上海首个「智能体矩阵」 + 韩国主权 AI MOU + arXiv 禁封 AI 幻觉论文</div>
         <div class="wk-hl-desc">中美：5/13-15 特朗普访华、习特北京峰会首次专门讨论前沿 AI 安全与建立类核热线的「前沿 AI 沟通机制」，黄仁勋、马斯克、库克、Micron / Qualcomm CEO 随访；5/11 WP 披露美情报机构与商务部争抢前沿 AI 模型预审权，NEC 主任 Hassett 公开正研究 FDA 式 AI 安全行政令，5/11 Axios 报道白宫最快本周宣布新 AI 安全执行行动。中国：5/15 中国信通院启动《人工智能终端智能化分级》GB/Z 177—2026 国标符合性检测、作为「以旧换新」分级依据；5/15 上海发布全国信息通信业首个智能体矩阵（基础网络 / 服务 / 安全 / 工业四维布局）；与 4 部门《AI 与能源双向赋能行动方案》、3 部门《智能体规范应用与创新发展实施意见》形成上下衔接。亚洲：5/15 韩国国防部与 SK 电讯签军事 AI 合作 MOU，「主权 AI」首次切入国防数字化。司法：5/11-14 Musk vs OpenAI 庭审进入第三周，Nadella 上庭、Altman 接受质询、披露 9 家关联公司逾 20 亿美元持股，5/21 前预期裁定。学术：5/16 arXiv 计算机科学板块宣布对未审查 AI 内容研究者实施 1 年禁投；5/17 Mistral CEO 公开警告法国国民议会不可让 Anthropic Mythos 扫描军方代码。</div>
         <div class="wk-hl-source"><a href="https://www.bloomberg.com/news/articles/2026-05-11/china-confirms-x-trump-summit-that-was-delayed-by-iran-war" target="_blank">→ Trump-Xi 北京峰会</a> &nbsp;·&nbsp; <a href="https://techcrunch.com/2026/05/16/research-repository-arxiv-will-ban-authors-for-a-year-if-they-let-ai-do-all-the-work/" target="_blank">→ arXiv 禁封</a> &nbsp;·&nbsp; <a href="https://www.stcn.com/article/detail/3910725.html" target="_blank">→ AI 终端国标检测</a></div>
+      </div>
     </div>
   </div>
 
@@ -5192,6 +5265,7 @@ html.dark .theme-toggle-thumb{transform:translateX(16px);}
         <div class="wk-hl-title">五大前沿模型纳入政府预审 + 白宫拟推 AI 安全行政令 + AI 终端国标 + 中欧 AI 治理同步收紧</div>
         <div class="wk-hl-desc">5/5 美国商务部 CAISI 与 Google DeepMind、Microsoft、xAI 签预审协议，叠加先前 OpenAI / Anthropic 协议，GPT、Claude、Gemini、Copilot、Grok 五大前沿系列首次同时进入政府前置评估；5/6 国家经济委员会主任 Hassett 确认白宫起草"FDA 式" AI 安全行政令，导火索是 Anthropic Mythos 大规模零日挖掘能力。5/8 网信办、发改委、工信部联合印发《智能体规范应用与创新发展实施意见》——国家层面首份对准 Agent 形态的指导文件；5/8 工信部正式发布《人工智能终端智能化分级》系列国标 GB/Z 177—2026（L1-L4 四级），5/11 新华社发深度解读"AI 终端的体检表"；5/8-9 四部门《AI 与能源双向赋能行动方案》部署 29 项任务，到 2030 年清洁能源-算力双向协同显著成效。欧盟：5/7 理事会与议会就简化 AI 法案规则达一致并禁止"裸化"应用，5/8 启动第 50 条透明度义务咨询、6/3 截止。5/11 中方确认 5/14-15 习近平-特朗普北京峰会，AI 安全首次纳入两国元首议程，白宫计划同周宣布新 AI 安全行政行动。</div>
         <div class="wk-hl-source"><a href="https://www.cnn.com/2026/05/05/tech/microsoft-google-xai-government-test-ai-models" target="_blank">→ CAISI 预审协议</a> &nbsp;·&nbsp; <a href="https://www.news.cn/politics/20260508/aa31c404610e4cc59f47fea3ab04929b/c.html" target="_blank">→ 智能体规范应用《意见》</a> &nbsp;·&nbsp; <a href="https://www.bloomberg.com/news/articles/2026-05-11/china-confirms-x-trump-summit-that-was-delayed-by-iran-war" target="_blank">→ Trump-Xi 北京峰会</a></div>
+      </div>
     </div>
   </div>
 
@@ -5306,6 +5380,7 @@ html.dark .theme-toggle-thumb{transform:translateX(16px);}
         <div class="wk-hl-title">五角大楼协议 + Musk-Altman 庭审 + 工信部"模数共振" + 杭州具身智能立法，监管与司法双线提速</div>
         <div class="wk-hl-desc">4/27 OpenAI vs Musk 一案在加州联邦法院开庭，4/30 Musk 庭审作证承认 xAI 早期对 OpenAI 模型做过蒸馏训练；5/1 庭审第一周收官，主审法官计划 5 月中作出最终裁定。同周 4/28 工信部 + 国家数据局联合发布 2026 "模数共振"行动，覆盖钢铁、石化、汽车、航空航天等 20 个重点行业；4/29 中央网信办公布 5月19-20日将于南宁发布《人工智能应用伦理安全指引（1.0版）》。5/1 五角大楼 7 家 AI 协议签订（独缺 Anthropic）+ 全国首部具身智能机器人立法《杭州市促进具身智能机器人产业发展条例》正式施行（700 余家企业 / 1068 亿元产值）；4/28 Meta 裁员 8000 人 + Microsoft 启动 8750 人买断方案，AI 重塑大厂员工结构。</div>
         <div class="wk-hl-source"><a href="https://www.news.cn/fortune/20260428/2a8d89b190784e838009af238a2e25eb/c.html" target="_blank">→ 工信部"模数共振"</a> &nbsp;·&nbsp; <a href="https://finance.sina.com.cn/jjxw/2026-05-01/doc-inhwkptm3442205.shtml" target="_blank">→ 杭州具身智能条例</a></div>
+      </div>
     </div>
   </div>
 
@@ -5803,6 +5878,286 @@ html.dark .theme-toggle-thumb{transform:translateX(16px);}
   <div class="footer">数据来源：C2PA 官网、Content Authenticity Initiative、各国政府公报、公开报道 · 由 Claude 整理于 2026.4.7</div>
 </div>
 </div><!-- /page-c2pa -->
+
+<div class="page" id="page-invest">
+<div style="max-width:900px;margin:0 auto;padding:0 24px 60px;">
+
+  <div class="invest-header">
+    <h1>投资参考</h1>
+    <p>AI 行业关键股票、估值、融资、ETF 与事件日历</p>
+    <span class="invest-date">数据更新于 2026年7月6日</span>
+  </div>
+
+  <!-- ═══ a) AI 股价追踪 ═══ -->
+  <div class="invest-section">
+    <div class="invest-section-title">AI 股价追踪</div>
+    <div class="invest-table-wrap">
+      <table class="invest-table">
+        <thead>
+          <tr><th>代码</th><th>公司</th><th>股价 (USD)</th><th>市值</th><th>备注</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ticker">NVDA</td><td>NVIDIA</td><td class="price">~$165</td><td class="mcap">~$4.1T</td>
+            <td class="note">AI 芯片绝对龙头，数据中心收入持续创新高</td>
+          </tr>
+          <tr>
+            <td class="ticker">MSFT</td><td>Microsoft</td><td class="price">~$510</td><td class="mcap">~$3.8T</td>
+            <td class="note">Azure AI + Copilot 双引擎，OpenAI 最大投资方</td>
+          </tr>
+          <tr>
+            <td class="ticker">GOOGL</td><td>Alphabet</td><td class="price">~$195</td><td class="mcap">~$2.4T</td>
+            <td class="note">Gemini 系列 + DeepMind，搜索 AI 化改造</td>
+          </tr>
+          <tr>
+            <td class="ticker">META</td><td>Meta Platforms</td><td class="price">~$680</td><td class="mcap">~$1.7T</td>
+            <td class="note">Llama 开源生态，AI 广告推荐系统驱动增长</td>
+          </tr>
+          <tr>
+            <td class="ticker">AAPL</td><td>Apple</td><td class="price">~$245</td><td class="mcap">~$3.7T</td>
+            <td class="note">Apple Intelligence 端侧 AI，Siri 大模型升级</td>
+          </tr>
+          <tr>
+            <td class="ticker">AMZN</td><td>Amazon</td><td class="price">~$225</td><td class="mcap">~$2.4T</td>
+            <td class="note">AWS Bedrock + Anthropic 投资，Alexa+ 重构</td>
+          </tr>
+          <tr>
+            <td class="ticker">TSM</td><td>台积电 (TSMC)</td><td class="price">~$220</td><td class="mcap">~$1.1T</td>
+            <td class="note">全球先进制程垄断，AI 芯片代工核心</td>
+          </tr>
+          <tr>
+            <td class="ticker">AVGO</td><td>Broadcom</td><td class="price">~$250</td><td class="mcap">~$1.2T</td>
+            <td class="note">定制 AI 芯片 (ASIC) + VMware 企业软件</td>
+          </tr>
+          <tr>
+            <td class="ticker">AMD</td><td>AMD</td><td class="price">~$165</td><td class="mcap">~$265B</td>
+            <td class="note">MI300X/MI400 追赶 NVIDIA，性价比路线</td>
+          </tr>
+          <tr>
+            <td class="ticker">PLTR</td><td>Palantir</td><td class="price">~$175</td><td class="mcap">~$410B</td>
+            <td class="note">AIP 平台政府+商业，AI 应用层标杆</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:-12px;">* 价格为近似参考值，可能与实时行情有差异</div>
+  </div>
+
+  <!-- ═══ b) 非上市 AI 公司估值 ═══ -->
+  <div class="invest-section">
+    <div class="invest-section-title">非上市 AI 公司估值</div>
+    <div class="invest-table-wrap">
+      <table class="invest-table">
+        <thead>
+          <tr><th>公司</th><th>估值</th><th>最新融资/动态</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Anthropic</td><td class="valuation">~$965B</td>
+            <td class="round-info">H 轮 $65B (2026.6)，Amazon / Google / Spark Capital 领投</td>
+          </tr>
+          <tr>
+            <td>OpenAI</td><td class="valuation">~$852B</td>
+            <td class="round-info">S-1 已递交，预计 2026 Q4 IPO；年化收入 ~$165B</td>
+          </tr>
+          <tr>
+            <td>SpaceX / xAI</td><td class="valuation">~$1.7-2T</td>
+            <td class="round-info">IPO 路演中，Grok 3 + Colossus 超算集群</td>
+          </tr>
+          <tr>
+            <td>DeepSeek (深度求索)</td><td class="valuation">~¥350B (~$50B)</td>
+            <td class="round-info">首轮外部融资，幻方量化孵化，开源路线</td>
+          </tr>
+          <tr>
+            <td>Databricks</td><td class="valuation">~$62B</td>
+            <td class="round-info">数据+AI 平台整合，Mosaic AI 产品线</td>
+          </tr>
+          <tr>
+            <td>Scale AI</td><td class="valuation">~$14B</td>
+            <td class="round-info">数据标注 → AI 评估平台转型</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══ c) 本周重要融资 ═══ -->
+  <div class="invest-section">
+    <div class="invest-section-title">本周重要融资</div>
+    <!-- INVEST_FUNDING_INSERT -->
+    <div class="invest-table-wrap">
+      <table class="invest-table">
+        <thead>
+          <tr><th>公司</th><th>轮次/类型</th><th>金额</th><th>详情</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Anthropic</td><td>H 轮</td><td class="price">$65B</td>
+            <td class="round-info">估值 $965B，Amazon / Google / Spark Capital 参投</td>
+          </tr>
+          <tr>
+            <td>Cognition (Devin)</td><td>B 轮</td><td class="price">$1B</td>
+            <td class="round-info">AI 编程智能体，估值约 $6B</td>
+          </tr>
+          <tr>
+            <td>快手可灵</td><td>战略融资</td><td class="price">$3B</td>
+            <td class="round-info">视频生成大模型独立融资</td>
+          </tr>
+          <tr>
+            <td>Quantum Systems</td><td>D 轮</td><td class="price">$1.2B</td>
+            <td class="round-info">AI 无人机，欧洲防务科技</td>
+          </tr>
+          <tr>
+            <td>Crusoe Energy</td><td>债务融资</td><td class="price">~$3B</td>
+            <td class="round-info">AI 数据中心清洁能源供应</td>
+          </tr>
+          <tr>
+            <td>TwelveLabs</td><td>B 轮</td><td class="price">$100M</td>
+            <td class="round-info">多模态视频理解 AI 平台</td>
+          </tr>
+          <tr>
+            <td>DeepSeek (深度求索)</td><td>首轮外部融资</td><td class="price">¥50B</td>
+            <td class="round-info">估值约 ¥350B，开源大模型领军</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══ d) AI ETF 参考 ═══ -->
+  <div class="invest-section">
+    <div class="invest-section-title">AI ETF 参考</div>
+    <div class="invest-table-wrap">
+      <table class="invest-table">
+        <thead>
+          <tr><th>代码</th><th>名称</th><th>聚焦领域</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ticker">BOTZ</td><td>Global X Robotics & AI</td>
+            <td class="round-info">机器人与 AI 工业应用，持仓含 NVIDIA、Intuitive Surgical 等</td>
+          </tr>
+          <tr>
+            <td class="ticker">AIQ</td><td>Global X AI & Technology</td>
+            <td class="round-info">广义 AI 技术公司，覆盖基础设施到应用层</td>
+          </tr>
+          <tr>
+            <td class="ticker">IGV</td><td>iShares Expanded Tech-Software</td>
+            <td class="round-info">科技软件龙头，含 Microsoft、Salesforce、ServiceNow</td>
+          </tr>
+          <tr>
+            <td class="ticker">SMH</td><td>VanEck Semiconductor</td>
+            <td class="round-info">半导体行业全覆盖，NVIDIA / TSM / AVGO 重仓</td>
+          </tr>
+          <tr>
+            <td class="ticker">CHAT</td><td>Roundhill Generative AI & Technology</td>
+            <td class="round-info">聚焦生成式 AI 产业链，含模型层+应用层公司</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══ e) 关键财报与事件日历 ═══ -->
+  <div class="invest-section">
+    <div class="invest-section-title">关键财报与事件日历</div>
+    <div class="invest-calendar">
+      <div class="invest-cal-item">
+        <div class="invest-cal-date">2026.6.30</div>
+        <div class="invest-cal-body">
+          <span class="invest-badge invest-badge-policy">立法</span>
+          科罗拉多 SB 205 AI 消费者保护法案生效
+          <small>美国首部综合性 AI 法规</small>
+        </div>
+      </div>
+      <div class="invest-cal-item">
+        <div class="invest-cal-date">2026 Q3</div>
+        <div class="invest-cal-body">
+          <span class="invest-badge invest-badge-ipo">IPO</span>
+          SpaceX / xAI IPO
+          <small>预计 2026 年 6-7 月路演，估值 $1.7-2T</small>
+        </div>
+      </div>
+      <div class="invest-cal-item">
+        <div class="invest-cal-date">2026.7</div>
+        <div class="invest-cal-body">
+          <span class="invest-badge invest-badge-earnings">财报</span>
+          Microsoft FY26 Q4 财报
+          <small>关注 Azure AI 收入增速、Copilot 付费用户数</small>
+        </div>
+      </div>
+      <div class="invest-cal-item">
+        <div class="invest-cal-date">2026.8.2</div>
+        <div class="invest-cal-body">
+          <span class="invest-badge invest-badge-policy">立法</span>
+          EU AI Act 全面生效
+          <small>高风险 AI 系统合规要求 + 第 50 条透明度义务</small>
+        </div>
+      </div>
+      <div class="invest-cal-item">
+        <div class="invest-cal-date">2026.8</div>
+        <div class="invest-cal-body">
+          <span class="invest-badge invest-badge-earnings">财报</span>
+          NVIDIA Q2 FY27 财报
+          <small>关注数据中心收入、Blackwell Ultra 出货量</small>
+        </div>
+      </div>
+      <div class="invest-cal-item">
+        <div class="invest-cal-date">2026.10</div>
+        <div class="invest-cal-body">
+          <span class="invest-badge invest-badge-ipo">IPO</span>
+          Anthropic IPO (预计)
+          <small>H 轮后估值 $965B，预计 2026 年 10 月上市</small>
+        </div>
+      </div>
+      <div class="invest-cal-item">
+        <div class="invest-cal-date">2026 Q4</div>
+        <div class="invest-cal-body">
+          <span class="invest-badge invest-badge-ipo">IPO</span>
+          OpenAI IPO (预计)
+          <small>S-1 已递交，预计 2026 Q4，估值 ~$852B</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ f) 重要合同与订单 ═══ -->
+  <div class="invest-section">
+    <div class="invest-section-title">重要合同与订单</div>
+    <div class="invest-table-wrap">
+      <table class="invest-table">
+        <thead>
+          <tr><th>项目</th><th>规模</th><th>详情</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Anthropic-SpaceX GPU 长约</td><td class="price">$45B</td>
+            <td class="round-info">至 2029.5，锁定 Starlink 卫星边缘推理 + Starship 运力</td>
+          </tr>
+          <tr>
+            <td>软银法国 AI 基建</td><td class="price">€75B</td>
+            <td class="round-info">5GW 数据中心集群，5 年期法国国家 AI 基础设施计划</td>
+          </tr>
+          <tr>
+            <td>韩国半导体 + AI 国家计划</td><td class="price">$576B</td>
+            <td class="round-info">政府主导产业政策，覆盖芯片制造、AI 研发、人才培养</td>
+          </tr>
+          <tr>
+            <td>微软 Frontier Company</td><td class="price">$2.5B + 6000 工程师</td>
+            <td class="round-info">安全 AGI 研发新实体，独立于 OpenAI 的前沿模型团队</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="invest-disclaimer">
+    数据仅供参考，不构成投资建议。价格为近似值，可能与实时行情有差异。<br>
+    数据来源：公开市场数据、新闻报道、SEC 文件 · 由 Claude 整理于 2026.7.6
+  </div>
+
+</div>
+</div><!-- /page-invest -->
 
 </div><!-- /app -->
 
