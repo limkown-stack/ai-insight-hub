@@ -5885,10 +5885,128 @@ html.dark .theme-toggle-thumb{transform:translateX(16px);}
   <div class="invest-header">
     <h1>投资参考</h1>
     <p>AI 行业关键股票、估值、融资、ETF 与事件日历</p>
-    <span class="invest-date">数据更新于 2026年7月6日</span>
+    <span class="invest-date" id="invest-update-date">数据更新于 2026年7月6日</span>
   </div>
 
-  <!-- ═══ a) AI 股价追踪 ═══ -->
+  <!-- ═══ 1) 未来30天大事件预告 (动态) ═══ -->
+  <div class="invest-section">
+    <div class="invest-section-title">📅 未来30天大事件预告</div>
+    <div class="invest-calendar">
+      <!-- INVEST_FORECAST_INSERT -->
+      <div class="invest-cal-item" data-date="2026-07-15">
+        <div class="invest-cal-date">2026.7.15</div>
+        <div class="invest-cal-body">
+          <span class="invest-badge invest-badge-policy">立法</span>
+          《人工智能拟人化互动服务管理暂行办法》施行
+          <small>中国 AI 拟人化交互监管新规正式生效</small>
+        </div>
+      </div>
+      <div class="invest-cal-item" data-date="2026-07-15">
+        <div class="invest-cal-date">2026.7 (mid)</div>
+        <div class="invest-cal-body">
+          <span class="invest-badge invest-badge-earnings">财报</span>
+          Microsoft FY26 Q4 财报
+          <small>关注 Azure AI 收入增速、Copilot 付费用户数</small>
+        </div>
+      </div>
+      <div class="invest-cal-item" data-date="2026-08-01">
+        <div class="invest-cal-date">2026.8</div>
+        <div class="invest-cal-body">
+          <span class="invest-badge invest-badge-earnings">财报</span>
+          NVIDIA Q2 FY27 财报
+          <small>关注数据中心收入、Blackwell Ultra 出货量</small>
+        </div>
+      </div>
+      <div class="invest-cal-item" data-date="2026-08-02">
+        <div class="invest-cal-date">2026.8.2</div>
+        <div class="invest-cal-body">
+          <span class="invest-badge invest-badge-policy">立法</span>
+          EU AI Act 全面生效 + 加州 SB-942 水印法生效
+          <small>高风险 AI 系统合规要求 + 第 50 条透明度义务；加州 AI 生成内容水印强制标注</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 2) 最新融资动态 (动态) ═══ -->
+  <div class="invest-section">
+    <div class="invest-section-title">最新融资动态</div>
+    <div class="invest-table-wrap">
+      <table class="invest-table">
+        <thead>
+          <tr><th>公司</th><th>轮次/类型</th><th>金额</th><th>详情</th></tr>
+        </thead>
+        <tbody>
+          <!-- INVEST_FUNDING_INSERT -->
+          <tr data-date="2026-06-30">
+            <td>DeepSeek (深度求索)</td><td>首轮外部融资</td><td class="price">¥50B</td>
+            <td class="round-info">估值约 ¥350B，开源大模型领军</td>
+          </tr>
+          <tr data-date="2026-06-28">
+            <td>TwelveLabs</td><td>B 轮</td><td class="price">$100M</td>
+            <td class="round-info">多模态视频理解 AI 平台</td>
+          </tr>
+          <tr data-date="2026-06-25">
+            <td>Cognition (Devin)</td><td>B 轮</td><td class="price">$1B</td>
+            <td class="round-info">AI 编程智能体，估值约 $6B</td>
+          </tr>
+          <tr data-date="2026-06-22">
+            <td>Quantum Systems</td><td>D 轮</td><td class="price">$1.2B</td>
+            <td class="round-info">AI 无人机，欧洲防务科技</td>
+          </tr>
+          <tr data-date="2026-06-20">
+            <td>Anthropic</td><td>H 轮</td><td class="price">$65B</td>
+            <td class="round-info">估值 $965B，Amazon / Google / Spark Capital 参投</td>
+          </tr>
+          <tr data-date="2026-06-18">
+            <td>快手可灵</td><td>战略融资</td><td class="price">$3B</td>
+            <td class="round-info">视频生成大模型独立融资</td>
+          </tr>
+          <tr data-date="2026-06-15">
+            <td>Crusoe Energy</td><td>债务融资</td><td class="price">~$3B</td>
+            <td class="round-info">AI 数据中心清洁能源供应</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══ 3) 重要合同与订单 (动态) ═══ -->
+  <div class="invest-section">
+    <div class="invest-section-title">重要合同与订单</div>
+    <div class="invest-table-wrap">
+      <table class="invest-table">
+        <thead>
+          <tr><th>项目</th><th>规模</th><th>详情</th></tr>
+        </thead>
+        <tbody>
+          <!-- INVEST_CONTRACTS_INSERT -->
+          <tr data-date="2026-06-15">
+            <td>微软 Frontier Company</td><td class="price">$2.5B + 6000 工程师</td>
+            <td class="round-info">安全 AGI 研发新实体，独立于 OpenAI 的前沿模型团队</td>
+          </tr>
+          <tr data-date="2026-06-10">
+            <td>软银法国 AI 基建</td><td class="price">€75B</td>
+            <td class="round-info">5GW 数据中心集群，5 年期法国国家 AI 基础设施计划</td>
+          </tr>
+          <tr data-date="2026-06-05">
+            <td>韩国半导体 + AI 国家计划</td><td class="price">$576B</td>
+            <td class="round-info">政府主导产业政策，覆盖芯片制造、AI 研发、人才培养</td>
+          </tr>
+          <tr data-date="2026-05-20">
+            <td>Anthropic-SpaceX GPU 长约</td><td class="price">$45B</td>
+            <td class="round-info">至 2029.5，锁定 Starlink 卫星边缘推理 + Starship 运力</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══ 参考数据分隔线 ═══ -->
+  <div style="border-top:1px solid var(--border);margin:40px 0 8px;"></div>
+  <div style="font-size:11px;color:var(--text-muted);margin-bottom:24px;">📌 参考数据（季度更新）</div>
+
+  <!-- ═══ 4) AI 股价追踪 (静态参考) ═══ -->
   <div class="invest-section">
     <div class="invest-section-title">AI 股价追踪</div>
     <div class="invest-table-wrap">
@@ -5943,7 +6061,7 @@ html.dark .theme-toggle-thumb{transform:translateX(16px);}
     <div style="font-size:11px;color:var(--text-muted);margin-top:-12px;">* 价格为近似参考值，可能与实时行情有差异</div>
   </div>
 
-  <!-- ═══ b) 非上市 AI 公司估值 ═══ -->
+  <!-- ═══ 5) 非上市 AI 公司估值 (静态参考) ═══ -->
   <div class="invest-section">
     <div class="invest-section-title">非上市 AI 公司估值</div>
     <div class="invest-table-wrap">
@@ -5981,50 +6099,7 @@ html.dark .theme-toggle-thumb{transform:translateX(16px);}
     </div>
   </div>
 
-  <!-- ═══ c) 本周重要融资 ═══ -->
-  <div class="invest-section">
-    <div class="invest-section-title">本周重要融资</div>
-    <!-- INVEST_FUNDING_INSERT -->
-    <div class="invest-table-wrap">
-      <table class="invest-table">
-        <thead>
-          <tr><th>公司</th><th>轮次/类型</th><th>金额</th><th>详情</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Anthropic</td><td>H 轮</td><td class="price">$65B</td>
-            <td class="round-info">估值 $965B，Amazon / Google / Spark Capital 参投</td>
-          </tr>
-          <tr>
-            <td>Cognition (Devin)</td><td>B 轮</td><td class="price">$1B</td>
-            <td class="round-info">AI 编程智能体，估值约 $6B</td>
-          </tr>
-          <tr>
-            <td>快手可灵</td><td>战略融资</td><td class="price">$3B</td>
-            <td class="round-info">视频生成大模型独立融资</td>
-          </tr>
-          <tr>
-            <td>Quantum Systems</td><td>D 轮</td><td class="price">$1.2B</td>
-            <td class="round-info">AI 无人机，欧洲防务科技</td>
-          </tr>
-          <tr>
-            <td>Crusoe Energy</td><td>债务融资</td><td class="price">~$3B</td>
-            <td class="round-info">AI 数据中心清洁能源供应</td>
-          </tr>
-          <tr>
-            <td>TwelveLabs</td><td>B 轮</td><td class="price">$100M</td>
-            <td class="round-info">多模态视频理解 AI 平台</td>
-          </tr>
-          <tr>
-            <td>DeepSeek (深度求索)</td><td>首轮外部融资</td><td class="price">¥50B</td>
-            <td class="round-info">估值约 ¥350B，开源大模型领军</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ═══ d) AI ETF 参考 ═══ -->
+  <!-- ═══ 6) AI ETF 参考 (静态参考) ═══ -->
   <div class="invest-section">
     <div class="invest-section-title">AI ETF 参考</div>
     <div class="invest-table-wrap">
@@ -6058,102 +6133,9 @@ html.dark .theme-toggle-thumb{transform:translateX(16px);}
     </div>
   </div>
 
-  <!-- ═══ e) 关键财报与事件日历 ═══ -->
-  <div class="invest-section">
-    <div class="invest-section-title">关键财报与事件日历</div>
-    <div class="invest-calendar">
-      <div class="invest-cal-item">
-        <div class="invest-cal-date">2026.6.30</div>
-        <div class="invest-cal-body">
-          <span class="invest-badge invest-badge-policy">立法</span>
-          科罗拉多 SB 205 AI 消费者保护法案生效
-          <small>美国首部综合性 AI 法规</small>
-        </div>
-      </div>
-      <div class="invest-cal-item">
-        <div class="invest-cal-date">2026 Q3</div>
-        <div class="invest-cal-body">
-          <span class="invest-badge invest-badge-ipo">IPO</span>
-          SpaceX / xAI IPO
-          <small>预计 2026 年 6-7 月路演，估值 $1.7-2T</small>
-        </div>
-      </div>
-      <div class="invest-cal-item">
-        <div class="invest-cal-date">2026.7</div>
-        <div class="invest-cal-body">
-          <span class="invest-badge invest-badge-earnings">财报</span>
-          Microsoft FY26 Q4 财报
-          <small>关注 Azure AI 收入增速、Copilot 付费用户数</small>
-        </div>
-      </div>
-      <div class="invest-cal-item">
-        <div class="invest-cal-date">2026.8.2</div>
-        <div class="invest-cal-body">
-          <span class="invest-badge invest-badge-policy">立法</span>
-          EU AI Act 全面生效
-          <small>高风险 AI 系统合规要求 + 第 50 条透明度义务</small>
-        </div>
-      </div>
-      <div class="invest-cal-item">
-        <div class="invest-cal-date">2026.8</div>
-        <div class="invest-cal-body">
-          <span class="invest-badge invest-badge-earnings">财报</span>
-          NVIDIA Q2 FY27 财报
-          <small>关注数据中心收入、Blackwell Ultra 出货量</small>
-        </div>
-      </div>
-      <div class="invest-cal-item">
-        <div class="invest-cal-date">2026.10</div>
-        <div class="invest-cal-body">
-          <span class="invest-badge invest-badge-ipo">IPO</span>
-          Anthropic IPO (预计)
-          <small>H 轮后估值 $965B，预计 2026 年 10 月上市</small>
-        </div>
-      </div>
-      <div class="invest-cal-item">
-        <div class="invest-cal-date">2026 Q4</div>
-        <div class="invest-cal-body">
-          <span class="invest-badge invest-badge-ipo">IPO</span>
-          OpenAI IPO (预计)
-          <small>S-1 已递交，预计 2026 Q4，估值 ~$852B</small>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ f) 重要合同与订单 ═══ -->
-  <div class="invest-section">
-    <div class="invest-section-title">重要合同与订单</div>
-    <div class="invest-table-wrap">
-      <table class="invest-table">
-        <thead>
-          <tr><th>项目</th><th>规模</th><th>详情</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Anthropic-SpaceX GPU 长约</td><td class="price">$45B</td>
-            <td class="round-info">至 2029.5，锁定 Starlink 卫星边缘推理 + Starship 运力</td>
-          </tr>
-          <tr>
-            <td>软银法国 AI 基建</td><td class="price">€75B</td>
-            <td class="round-info">5GW 数据中心集群，5 年期法国国家 AI 基础设施计划</td>
-          </tr>
-          <tr>
-            <td>韩国半导体 + AI 国家计划</td><td class="price">$576B</td>
-            <td class="round-info">政府主导产业政策，覆盖芯片制造、AI 研发、人才培养</td>
-          </tr>
-          <tr>
-            <td>微软 Frontier Company</td><td class="price">$2.5B + 6000 工程师</td>
-            <td class="round-info">安全 AGI 研发新实体，独立于 OpenAI 的前沿模型团队</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
   <div class="invest-disclaimer">
     数据仅供参考，不构成投资建议。价格为近似值，可能与实时行情有差异。<br>
-    数据来源：公开市场数据、新闻报道、SEC 文件 · 由 Claude 整理于 2026.7.6
+    数据来源：公开市场数据、新闻报道、SEC 文件 · 由 Claude 整理于 <span id="invest-disclaimer-date">2026.7.6</span>
   </div>
 
 </div>
